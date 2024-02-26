@@ -5,10 +5,9 @@
    they differ by more than one 
 */
 
-module avl
+module std/data/avl
 
 import std/os/env
-import std/core/types
 import std/core/types
 import std/core/undiv
 import std/core/hnd
@@ -18,22 +17,22 @@ import std/core/string
 import std/core/int
 
 // A tree with `:k` keys and values `:a` in each node and last field representing the height of the tree
-type tree<k,a>
+pub type tree<k,a>
   Leaf
   Node(left : tree<k,a>, k: k, value : a, right : tree<k,a>, height: int)
 
 // Gives the height of the tree 
-fun height (m : tree<k,a>) : int 
+pub fun height (m : tree<k,a>) : int 
   match m 
     Leaf -> 0
     Node(_, _, _, _, h) -> h
 
-fun is_empty (m : tree<k, a>) : bool
+pub fun is_empty (m : tree<k, a>) : bool
   match m 
     Leaf -> True
     Node(_, _, _, _, _) -> False
 
-fun mem (m : tree<k,a>, x : k, ?cmp : (k, k) -> order): bool 
+pub fun mem (m : tree<k,a>, x : k, ?cmp : (k, k) -> order): bool 
   match m 
     Leaf -> False
     Node(l, k, _, r, _) 
@@ -41,7 +40,7 @@ fun mem (m : tree<k,a>, x : k, ?cmp : (k, k) -> order): bool
          elif (x == k) then True 
          else mem(r, x)
 
-fun find (m : tree<k,a>, x : k, ?cmp: (k, k) -> order) : maybe<a>
+pub fun find (m : tree<k,a>, x : k, ?cmp: (k, k) -> order) : maybe<a>
   match m 
     Leaf -> Nothing
     Node(l, k, v, r, _) -> 
@@ -49,31 +48,54 @@ fun find (m : tree<k,a>, x : k, ?cmp: (k, k) -> order) : maybe<a>
       elif (x == k) then Just(v)
       else find(r, x)
 
-fun create (lm : tree<k,a>, x : k, v : a, rm : tree<k, a>) : tree <k,a>
+pub fun create (lm : tree<k,a>, x : k, v : a, rm : tree<k, a>) : tree <k,a>
   Node(lm, x, v, rm, (max(height(lm), height(rm)) + 1))
 
-fun rotl (m : tree<k,a>) : <exn|e> tree<k,a> 
+pub fun rotl (m : tree<k,a>) : <exn|e> tree<k,a> 
   match m 
     Node(lm, k, v, Node(lm', k', v', rm', _), _) 
       -> create (create(lm, k, v, lm'), k', v', rm')
     _ -> throw("left rotation is not possible")
 
-
-fun rotr (m : tree<k,a>) : <exn|e> tree<k,a>
+pub fun rotr (m : tree<k,a>) : <exn|e> tree<k,a>
   match m 
     Node(Node(lm, kl, vl, rm), k, v, rm', _)
       -> create(lm, kl, vl, create(rm, k, v, rm'))
     _ -> throw("right rotation is not possible")
 
-pub fun main () {
-  //val tr = Node((Node(Leaf, 1, 4, Leaf, 1)), 2, 2, (Node(Leaf, 3, 6, Leaf, 1)), 2)
-  val tr = create(Node(Leaf, 1, 4, Leaf, 1), 2, 2, Node(Leaf, 3, 6, Leaf, 1))
-  val h = height(tr)
-  val key = 3
-  val result = find(tr, key)
-  println("The membership result is " ++ result.show)
-  println("The height is " ++ h.show)
-}
+
+pub fun insert (m : tree<k,a>, x : k, v : a, ?cmp: (k, k) -> order) : <exn|e> tree<k,a> 
+  match m
+    Leaf -> Node(Leaf, x, v, Leaf, 1)
+    Node(l, k, d, r, h) -> 
+      if (x == k) then Node(l, k, v, r, h)
+      elif (x < k) then match insert(l, x, v) 
+                          Leaf -> throw("Not possible")
+                          Node(tl, kl, dl, rl, hl) -> 
+                            if (hl - height(r)) <= 1 
+                            then create(Node (tl, kl, dl, rl, hl), k, d, r)
+                            else if (height(tl) < height(rl))
+                                 then rotr(create (rotl (Node (tl, kl, dl, rl, hl)), k, d, r))
+                                 else rotr(create ((Node (tl, kl, dl, rl, hl)), k, d, r))
+      else match insert(r, x, v) 
+            Leaf -> throw("Not possible")
+            Node(tr, kr, dr, rr, hr) -> 
+              if (hr - height(l)) <= 1 
+              then create(l, k, d, Node (tr, kr, dr, rr, hr))
+              else if (height(tr) > height(rr))
+                   then rotl(create (l, k, d, rotr (Node(tr, kr, dr, rr, hr))))
+                   else rotl(create (l, k, d, (Node(tr, kr, dr, rr, hr))))
+
+
+pub fun check_balanced (m : tree<k, a>) : bool 
+  match m 
+    Leaf -> True 
+    Node (l, _, _, r, h) -> if (h == (max(height(l), height(r)) + 1))
+                            then check_balanced(l) && check_balanced(r)
+                            else False
+
+
+
 
 
 
