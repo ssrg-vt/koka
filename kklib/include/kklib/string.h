@@ -495,5 +495,8 @@ kk_decl_export kk_string_t kk_double_show_fixed(double d, int32_t prec, kk_conte
 kk_decl_export kk_string_t kk_double_show_exp(double d, int32_t prec, kk_context_t* ctx);
 kk_decl_export kk_string_t kk_double_show(double d, int32_t prec, kk_context_t* ctx);
 
+// eBPF
+kk_decl_export kk_unit_t   kk_bpf_println(kk_string_t s, kk_context_t* ctx);
+
 
 #endif // include guard

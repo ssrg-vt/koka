@@ -81,3 +81,25 @@ pub fun string/println(s : string) : console ()
 // Print a value that has a `show` function, including a final newline character.
 pub fun show/println( x : a, ?show : a -> string ) : console ()
   printsln(x.show)
+
+// eBPF 
+// Print a string to the console, including a final newline character.
+extern bpf_xprintsln(s : string) : console ()
+  c  "kk_bpf_println"
+
+
+noinline fun bpf_printsln( s : string ) : console ()
+  (unsafe-nostate
+    match !redirect
+      Nothing -> bpf_xprintsln(s)
+      Just(f) -> { f(s ++ "\n") }
+  )()
+
+// Print a string to the console, including a final newline character.
+pub fun string/bpf_printk(s : string) : console ()
+  bpf_printsln(s)
+
+// Print a value that has a `show` function, including a final newline character.
+pub fun show/bpf_printk( x : a, ?show : a -> string ) : console ()
+  bpf_printsln(x.show)
+
