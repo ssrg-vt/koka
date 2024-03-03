@@ -15,6 +15,8 @@
 #include "kklib.h"
 #include <string.h>
 #include <stdio.h>
+#include <linux/bpf.h>
+#include <bpf/bpf_helpers.h>
 
 
 // Allow reading aligned words as long as some bytes in it are part of a valid C object

@@ -7,7 +7,7 @@ import std/core/console
 //SEC("tracepoint/syscalls/sys/enter_execve")
 
 fun hello_world() : console() {
-  val msg = "Hello World!"
+  val msg = "Print Hello World!"
   bpf_printk("invoke hello_world: " ++ msg)
 }
 
