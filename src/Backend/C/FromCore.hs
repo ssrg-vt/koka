@@ -297,53 +297,64 @@ genTopGroups groups
   = localUnique $
     mapM_ genTopGroup groups
 
+-- SecC is taken as True in non-recirsive ??
 genTopGroup :: DefGroup -> Asm ()
 genTopGroup group
   = do case group of
         DefRec defs   -> do mapM_ genFunTopDefSig defs
-                            mapM_ (genTopDef False False) defs
+                            mapM_ (genTopDef False False False) defs
         DefNonRec def -> do let inlineC =  (defInline def == InlineAlways || isInlineable 5 def)
-                            genTopDef True inlineC def
+                            genTopDef True True inlineC def
 
+-- SecC is taken as false ??
 genFunTopDefSig :: Def -> Asm ()
 genFunTopDefSig def@(Def name tp defExpr vis sort inl rng comm)
   = do penv <- getPrettyEnv
        let tpDoc = typeComment (Pretty.ppType penv tp)
-           sig   = (genFunDefSig False def)
+           sig   = (genFunDefSig False False def)
        -- (if (isPublic vis) then emitToH else emitToC)
        emitToH (linebreak <.> sig <.> semi <+> tpDoc)
 
-genFunDefSig :: Bool -> Def -> Doc
-genFunDefSig inlineC def@(Def name tp defExpr vis sort inl rng comm)
-  = genFunSig inlineC vis name defExpr
+-- adding a new attribute to function declaration to represent ebpf sec 
+genFunDefSig :: Bool -> Bool -> Def -> Doc
+genFunDefSig secC inlineC def@(Def name tp defExpr vis sort inl rng comm)
+  = genFunSig secC inlineC vis name defExpr
 
-genFunSig :: Bool -> Visibility -> Name -> Expr -> Doc
-genFunSig inlineC vis name defExpr
+-- adding a new attribute to function signature to represent ebpf sec
+genFunSig :: Bool -> Bool -> Visibility -> Name -> Expr -> Doc
+genFunSig secC inlineC vis name defExpr
   = let tryFun expr = case expr of
                         TypeApp e _   -> tryFun e
                         TypeLam _ e   -> tryFun e
-                        Lam params eff body  -> genLamSig inlineC vis name params body
+                        Lam params eff body  -> genLamSig secC inlineC vis name params body
                         _             -> error ("Backend.C.FromCore.genFunDefSig: not a function: " ++ show (name,defExpr))
     in tryFun defExpr
 
-genLamSig :: Bool -> Visibility -> Name -> [TName] -> Expr -> Doc
-genLamSig inlineC vis name params body
-  = (if (inlineC) then text "static inline "
-       -- else if (not (isPublic vis)) then text "static "
-       else empty) <.>
+-- adding a new attribute to lambda signature to represent ebpf sec
+genLamSig :: Bool -> Bool -> Visibility -> Name -> [TName] -> Expr -> Doc
+genLamSig secC inlineC vis name params body
+  = (if (secC) then (if (inlineC) 
+                     then text " __attribute((hot)) static inline "
+                       -- else if (not (isPublic vis)) then text "static "
+                     else text " __attribute((hot)) ") 
+               else (if (inlineC) 
+                     then text " static inline "
+                       -- else if (not (isPublic vis)) then text "static "
+                     else empty))  <.>
     ppType (typeOf body) <+> ppName name <.> tparameters params
 
-
-genTopDef :: Bool -> Bool -> Def -> Asm ()
-genTopDef genSig inlineC def@(Def name tp expr vis sort inl rng comm)
+-- adding a new attribute to top def to represent ebpf sec and no decision is based on sec  
+genTopDef :: Bool -> Bool -> Bool -> Def -> Asm ()
+genTopDef genSig secC inlineC def@(Def name tp expr vis sort inl rng comm)
   = do when (not (null comm)) $
          (if inlineC then emitToH else emitToC) (align (vcat (space : map text (lines (trimComment comm))))) {- already a valid C comment -}
-       genTopDefDecl genSig inlineC def
+       genTopDefDecl genSig secC inlineC def
 
-genTopDefDecl :: Bool -> Bool -> Def -> Asm ()
-genTopDefDecl genSig inlineC def@(Def name tp defBody vis sort inl rng comm) | isValueOperation tp
+-- adding a new attribute to top def decl to represent ebpf sec 
+genTopDefDecl :: Bool -> Bool -> Bool -> Def -> Asm ()
+genTopDefDecl genSig secC inlineC def@(Def name tp defBody vis sort inl rng comm) | isValueOperation tp
   = return () -- don't generate code for phantom definitions for value operations (these were only needed for type checking)
-genTopDefDecl genSig inlineC def@(Def name tp defBody vis sort inl rng comm)
+genTopDefDecl genSig secC inlineC def@(Def name tp defBody vis sort inl rng comm)
   = let tryFun expr = case expr of
                         TypeApp e _   -> tryFun e
                         TypeLam _ e   -> tryFun e
@@ -394,7 +405,7 @@ genTopDefDecl genSig inlineC def@(Def name tp defBody vis sort inl rng comm)
                       genStat (ResultReturn (Just (TName name resTp)) params) body
            penv <- getPrettyEnv
            let tpDoc = typeComment (Pretty.ppType penv tp)
-           let sig = genLamSig inlineC vis name params body
+           let sig = genLamSig secC inlineC vis name params body
            when (genSig && not inlineC {-&& isPublic (defVis def)-}) $ emitToH (linebreak <.> sig <.> semi <+> tpDoc)
            top <- getTop -- get top level decls generated by body (for functions etc)
            emit $ linebreak
