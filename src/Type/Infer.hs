@@ -205,7 +205,7 @@ inferDefGroup topLevel (DefRec defs) cont
     createGammas :: [(Name,NameInfo)] -> [(Name,NameInfo)] -> [Def Type] -> Inf ([(Name,NameInfo)],[(Name,NameInfo)])
     createGammas gamma infgamma []
       = return (reverse gamma, reverse infgamma)
-    createGammas gamma infgamma (Def (ValueBinder name () expr nameRng vrng) rng vis sort inl doc : defs)
+    createGammas gamma infgamma (Def (ValueBinder name () expr nameRng vrng) rng vis sort inl doc seca: defs)
       = case (lookup name infgamma) of
           (Just _)
             -> do env <- getPrettyEnv
@@ -455,7 +455,7 @@ inferRecDef topLevel infgamma def
 
 
 inferDef :: Expect -> Def Type -> Inf Core.Def
-inferDef expect (Def (ValueBinder name mbTp expr nameRng vrng) rng vis sort inl doc)
+inferDef expect (Def (ValueBinder name mbTp expr nameRng vrng) rng vis sort inl doc seca)
  =do penv <- getPrettyEnv
      if (verbose penv >= 4)
       then Lib.Trace.trace ("infer: " ++ show sort ++ " " ++ show name) $ return ()
@@ -488,7 +488,7 @@ isAnnotatedBinder (ValueBinder _ Just{} _ _ _) = True
 isAnnotatedBinder _                                 = False
 
 inferBindDef :: Def Type -> Inf (Effect,Core.Def)
-inferBindDef def@(Def (ValueBinder name () expr nameRng vrng) rng vis sort inl doc)
+inferBindDef def@(Def (ValueBinder name () expr nameRng vrng) rng vis sort inl doc seca)
   = -- trace ("infer bind def: " ++ show name ++ ", var?:" ++ show (sort==DefVar)) $
     do withDefName name $ disallowHole $
         do (tp,eff,coreExpr) <- inferExpr Nothing Instantiated expr

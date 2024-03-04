@@ -204,6 +204,7 @@ data Def t
        , defSort   :: !DefSort
        , defInline :: !DefInline
        , defDoc    :: !String
+       , defSec    :: !(Maybe String)
        }
   deriving (Show)
 
