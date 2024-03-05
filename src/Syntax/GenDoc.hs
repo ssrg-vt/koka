@@ -197,7 +197,7 @@ genDoc env kgamma gamma core p
       where
         toDef (ExternalImport {}) = []
         toDef ext = [Def (externalName ext) (externalType ext) exprUnit
-                         (externalVis ext) (defFun (externalParams ext)) InlineAuto (externalRange ext) (externalDoc ext)]
+                         (externalVis ext) Nothing (defFun (externalParams ext)) InlineAuto (externalRange ext) (externalDoc ext)]
 
     htmlBody pre
       = do mapM_ (writeLn p) (htmlHeader env (show (coreProgName core)))

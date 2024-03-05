@@ -1873,7 +1873,7 @@ extendGammaCore isAlreadyCanonical (coreGroup:coreDefss) inf
       = [coreDefInfoX def]  -- used to be coreDefInfo
 
 -- Specialized for recursive defs where we sometimes get InfoVal even though we want InfoFun? is this correct for the csharp backend?
-coreDefInfoX def@(Core.Def name tp expr vis sort inl nameRng doc)
+coreDefInfoX def@(Core.Def name tp expr vis seca sort inl nameRng doc)
   = (name {- nonCanonicalName name -}, createNameInfoX Public name sort nameRng tp doc)
 
 -- extend gamma with qualified names

@@ -242,7 +242,7 @@ makeDef fvs tvs (pinfos, (origName, (expr, doc)))
     liftedFun = addTypeLambdas alltpars $ Lam allpars eff body
     liftedTp  = typeOf liftedFun
     liftedDef dnames name inl
-            = Def name liftedTp liftedFun Private (defFun allpinfos) inl rangeNull
+            = Def name liftedTp liftedFun Private Nothing (defFun allpinfos) inl rangeNull
               $ "// lifted local: " ++ concat (intersperse ", " (map (show . unqualify) (dnames ++ [getName origName]))) ++ "\n" ++ doc
 
     funExpr name

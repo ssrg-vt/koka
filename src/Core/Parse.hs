@@ -304,7 +304,7 @@ defDecl env
        return (Def (qualify (modName env) name) tp
                     -- (error ("Core.Parse: " ++ show name ++ ": cannot get the expression from an interface core file"))
                     exprUnit
-                   vis sort inl range doc)
+                   vis Nothing sort inl range doc)
 
 pdefSort
   = do isRec <- do{ specialId "recursive"; return True } <|> return False
@@ -549,7 +549,7 @@ parseDefGroup env
        -- inl        <- parseInline
        tp         <- typeAnnot env
        expr       <- parseBody env
-       return (envExtendLocal env (name,tp), DefNonRec (Def name tp expr Private sort inl range doc))
+       return (envExtendLocal env (name,tp), DefNonRec (Def name tp expr Private Nothing sort inl range doc))
 
 prange :: Env -> LexParser Range
 prange env

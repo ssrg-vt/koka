@@ -319,7 +319,7 @@ replaceCall name expr0 sort bools args mybeTypeArgs
                 Nothing -> body
                 Just typeArgs -> subNew (zip (fnTypeParams expr) typeArgs) |-> body)
               $ Lam newParams (fnEffect expr)  -- fn <newparams>
-              $ Let [DefNonRec $ Def param typ arg Private DefVal InlineAuto rangeNull ""  -- bind specialized parameters
+              $ Let [DefNonRec $ Def param typ arg Private Nothing DefVal InlineAuto rangeNull "" -- bind specialized parameters
                       | (TName param typ, arg) <- zip speccedParams speccedArgs]
               $ fnBody expr
 
@@ -340,7 +340,7 @@ replaceCall name expr0 sort bools args mybeTypeArgs
       sspecBody <- uniqueSimplify defaultEnv False False 1 10 specBody
       -- trace ("\n// ----start--------\n// specializing " <> show name <> " to parameters " <> show speccedParams <> " with args " <> comment (show speccedArgs) <> "\n// specTName: " <> show (getName specTName) <> ", specBody0: \n" <> show specBody <> "\n\n, sspecBody: \n" <> show sspecBody <> "\n// ---- start recurse---") $ return ()
 
-      let specDef = Def specName specType sspecBody Private sort InlineAuto rangeNull
+      let specDef = Def specName specType sspecBody Private Nothing sort InlineAuto rangeNull
                      $ "// specialized: " <> show name <> ", on parameters " <> concat (intersperse ", " (map show speccedParams)) <> ", using:\n" <>
                        comment (unlines [show param <> " = " <> show arg | (param,arg) <- zip speccedParams speccedArgs])
 

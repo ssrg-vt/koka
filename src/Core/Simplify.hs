@@ -206,7 +206,7 @@ topDown expr@(App (Lam pars eff body) args) | length pars == length args
        return expr'
   where
     makeDef (TName npar nparTp) arg
-      = DefNonRec (Def npar nparTp arg Private DefVal InlineAuto rangeNull "")
+      = DefNonRec (Def npar nparTp arg Private Nothing DefVal InlineAuto rangeNull "")
 
 
 -- Direct function applications
@@ -221,7 +221,7 @@ topDown expr@(App (TypeApp (TypeLam tpars (Lam pars eff body)) targs) args)
        return newexpr
   where
     makeDef (TName npar nparTp) arg
-      = DefNonRec (Def npar nparTp arg Private DefVal InlineAuto rangeNull "")
+      = DefNonRec (Def npar nparTp arg Private Nothing DefVal InlineAuto rangeNull "")
 
 
 -- case-of-let
@@ -344,7 +344,7 @@ bottomUp (App (Lam pars eff body) args) | length pars == length args  && all fre
   = Let (zipWith makeDef pars args) body
   where
     makeDef (TName npar nparTp) arg
-      = DefNonRec (Def npar nparTp arg Private DefVal InlineAuto rangeNull "")
+      = DefNonRec (Def npar nparTp arg Private Nothing DefVal InlineAuto rangeNull "")
 
     free parName
       = not (parName `S.member` fv args)
@@ -648,7 +648,7 @@ instance Simplify DefGroup where
   simplify (DefNonRec def ) = fmap DefNonRec (simplify def)
 
 instance Simplify Def where
-  simplify def@(Def name tp expr vis sort inl nameRng doc)
+  simplify def@(Def name tp expr vis sort inl nameRng doc seca)
     = -- trace ("simplifying " ++ show name ) $ -- ++ ": " ++ show expr) $
       do expr' <- inDef name $
                   case expr of
@@ -659,7 +659,7 @@ instance Simplify Def where
                       -> do body' <- simplify body
                             return $ Lam pars eff body'
                     _ -> simplify expr
-         return $ Def name tp expr' vis sort inl nameRng doc
+         return $ Def name tp expr' vis sort inl nameRng doc seca
 
 instance Simplify a => Simplify [a] where
   simplify  = mapM simplify

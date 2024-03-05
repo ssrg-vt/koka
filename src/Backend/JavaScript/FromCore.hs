@@ -188,7 +188,7 @@ genGroup topLevel group
       DefNonRec def -> genDef topLevel def
 
 genDef :: Bool -> Def -> Asm Doc
-genDef topLevel def@(Def name tp expr vis sort inl rng comm)
+genDef topLevel def@(Def name tp expr vis seca sort inl rng comm)
   = do penv <- getPrettyEnv
        let resDoc = typeComment (Pretty.ppType penv tp)
        defDoc <- do mdoc <- tryFunDef name resDoc expr

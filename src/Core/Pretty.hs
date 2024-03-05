@@ -278,7 +278,7 @@ prettyInlineDef env (InlineDef name expr isRec inlkind cost sort specArgs)
 prettyDef :: Env-> Def -> Doc
 prettyDef env def = prettyDefX env True def
 
-prettyDefX env isRec def@(Def name scheme expr vis sort inl nameRng doc)
+prettyDefX env isRec def@(Def name scheme expr vis seca sort inl nameRng doc)
   = prettyComment env doc $
     {- if (nameIsNil name && not isRec && coreShowDef env && not (coreShowVis env))
       then ppBody <.> semi
@@ -378,7 +378,7 @@ prettyExpr env (Lit lit)
   = prettyLit env lit
 
 --
-prettyExpr env (Let ([DefNonRec (Def x tp e vis isVal inl nameRng doc)]) e')
+prettyExpr env (Let ([DefNonRec (Def x tp e vis seca isVal inl nameRng doc)]) e')
   = vcat [ let exprDoc = prettyExpr env e <.> semi
            in {- if (nameIsNil x) then exprDoc
                else -}
@@ -630,16 +630,16 @@ instance HasTypeVar DefGroup where
 
 
 instance HasTypeVar Def where
-  sub `substitute` (Def name scheme expr vis isVal inl nameRng doc)
-    = Def name (sub `substitute` scheme) (sub `substitute` expr) vis isVal inl nameRng doc
+  sub `substitute` (Def name scheme expr vis isVal inl nameRng doc seca)
+    = Def name (sub `substitute` scheme) (sub `substitute` expr) vis isVal inl nameRng doc seca
 
-  ftv (Def name scheme expr vis isVal inl nameRng doc)
+  ftv (Def name scheme expr vis isVal inl nameRng doc seca)
     = ftv scheme `tvsUnion` ftv expr
 
-  btv (Def name scheme expr vis isVal inl nameRng doc)
+  btv (Def name scheme expr vis isVal inl nameRng doc seca)
     = btv scheme `tvsUnion` btv expr
 
-  ftc (Def name scheme expr vis isVal inl nameRng doc)
+  ftc (Def name scheme expr vis isVal inl nameRng doc seca)
     = tcsUnion (ftc scheme) (ftc expr)
 
 instance HasTypeVar Expr where
