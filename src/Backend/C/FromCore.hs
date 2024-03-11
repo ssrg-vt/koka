@@ -297,7 +297,6 @@ genTopGroups groups
   = localUnique $
     mapM_ genTopGroup groups
 
--- SecC is taken as True in non-recirsive ??
 genTopGroup :: DefGroup -> Asm ()
 genTopGroup group
   = do case group of
@@ -306,7 +305,6 @@ genTopGroup group
         DefNonRec def -> do let inlineC =  (defInline def == InlineAlways || isInlineable 5 def)
                             genTopDef True inlineC def
 
--- SecC is taken as false ??
 genFunTopDefSig :: Def -> Asm ()
 genFunTopDefSig def@(Def name tp defExpr vis seca sort inl rng comm)
   = do penv <- getPrettyEnv
@@ -337,7 +335,7 @@ genLamSig seca inlineC vis name params body
       Just a -> (if (inlineC) 
                      then text (" __attribute__((section(" ++ show (a) ++ "), used)) static inline ")
                        -- else if (not (isPublic vis)) then text "static "
-                     else empty) 
+                     else text (" __attribute__((section(" ++ show (a) ++ "), used)) ")) 
       Nothing -> (if (inlineC) 
                      then text " static inline "
                        -- else if (not (isPublic vis)) then text "static "

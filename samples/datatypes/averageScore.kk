@@ -7,6 +7,12 @@ struct student
   name : string
   score : int 
 
+fun get_name (s : ref<h,student>) : <read<h>> int {
+  val r1 = !s
+  val r2 = r1.score
+  return r2
+}
+
 fun sum_score (ss : list <student>) : int {
   match ss 
     Nil -> 0
@@ -24,5 +30,6 @@ pub fun main() {
   val student2 = Student("Bash", 50)
   val student3 = Student("Khushboo", 30)
   val average = average_score(Cons(student1, Cons(student2, Cons(student3, Nil))))
+  //val name = get_name(ref(student1))
   println("The sum of marks of all students is " ++ average.show)
 }
