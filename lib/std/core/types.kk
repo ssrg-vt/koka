@@ -524,4 +524,17 @@ pub inline fip extern cctx/empty() : cctx<a,a>
   c  "kk_cctx_empty"
   js "$std_core_types._cctx_empty"
 
+/* pos is a datatype representing a strictly postive integers in a binary way,
+   starting from 1 (represented as xH), one can add a least significant digit via 
+   xO (digit 0) or xI (digit 1) */
+// 6 : Binary representation 110 -> xO(xI(xH))
+// 2 : 10 -> x0(xH)
+// 3 : 11 -> xI(xH)
+// 4 : 100 -> xO(xO(xH))
+pub type pos 
+  con XH 
+  con XO(elm_zero: pos)
+  con XI(elm_one: pos)
+
+
 
