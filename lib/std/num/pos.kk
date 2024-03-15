@@ -45,6 +45,15 @@ pub fun pos_to_int (i : int, acc: int, p : pos) : int
 pub fun sub_pos (p1, p2 : pos) : int 
   (pos_to_int(0, 0, p1) - pos_to_int(0, 0, p2))
 
+// Substraction of two positive numbers that safely only produces positive number
+// We can ensure that value of if value of p1 and p2 is statically known 
+// then we can reject (p1 - p2) <= 0 by doing program analysis like constant propagation/constant folding
+pub fun safe_sub_pos (p1, p2 : pos) : <div,exn|e> pos 
+  val r = sub_pos(p1, p2)
+  if (r <= 0) 
+  then throw ("Producing zero is not allowed") 
+  else int_to_pos(r)
+
 // Convert int to pos : raises an exception 
 pub fun int_to_pos (i : int) : <div,exn|e> pos 
   if i <= 0 
@@ -66,14 +75,15 @@ pub fun main()
   println("The successor of " ++ p.show_pos ++ " is " ++ r.show_pos)
   println("The addition of " ++ p1.show_pos ++ " and " ++ p2.show_pos ++ " is " ++ rs.show_pos)
   println("The integer representation of " ++ p.show_pos ++ " is " ++ (pos_to_int(0, 0, p)).show)
-  println("The substraction of " ++ p1.show_pos ++ " and " ++ p2.show_pos ++ " is " ++ sub.show)
+  println("The substraction of " ++ p1.show_pos ++ " and " ++ p.show_pos ++ " is " ++ safe_sub_pos(p1, p).show_pos)
   println("The pos of int " ++ int_to_pos(4).show_pos)
 
+/* Rejected by the type-checker 
 pub fun main ()
   val i1 = 2;
   val i2 = 0;
   val r = pos_div (i1, i2)
-  println("The result of diving " ++ i1.show ++ " and " ++ i2.show ++ " is" ++ r.show)
+  println("The result of diving " ++ i1.show ++ " and " ++ i2.show ++ " is" ++ r.show) */
 
 
 

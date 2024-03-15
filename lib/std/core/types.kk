@@ -536,5 +536,10 @@ pub type pos
   con XO(elm_zero: pos)
   con XI(elm_one: pos)
 
+/* neg_pos is a datatype representing either negative integers or a positive integers */
+pub type neg_pos 
+  con Pos(pos_elm: pos)
+  con Neg(pos_elm: pos)
+
 
 
