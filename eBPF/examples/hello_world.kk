@@ -4,13 +4,13 @@ import std/num/int32
 import std/core/string
 import std/core/console
 
-//SEC("tracepoint/syscalls/sys/enter_execve")
-
-fun hello_world() : console() {
-  val msg = "Print Hello World!"
-  bpf_printk("invoke hello_world: " ++ msg)
+pub sec "tracepoint/syscalls/sys_enter_execve" fun hello_world() {
+  val s = "Hello World"
+  //println("Check printing in tracepoint: " ++ s.show)
+  bpf_printk(s);
 }
 
-pub fun main() : console() {
+pub fun main() {
   hello_world()
 }
+

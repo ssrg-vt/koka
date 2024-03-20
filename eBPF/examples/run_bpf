@@ -1,0 +1,1 @@
+clang -target bpf -I/usr/include/x86_64-linux-gnu -I/home/criudsm/Desktop/koka/kklib/include -g -o test_hello_world_xdp.o -c test_hello_world_xdp.c

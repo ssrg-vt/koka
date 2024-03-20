@@ -11,12 +11,13 @@ import std/num/int32
    All other return codes are reserved for future use. 
    Unknown return codes will result in packet drops and a warning vid bpf_warn_invalid_xdp_action()
  */
-pub type xdp_action 
+pub type xdp_action {
   XDP_ABORTED 
   XDP_DROP
   XDP_PASS
   XDP_TX
   XDP_REDIRECT
+}
 
 pub fun xdp_action_show( xdp : xdp_action ) : string
   match xdp
