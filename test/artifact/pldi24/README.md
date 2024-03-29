@@ -178,6 +178,91 @@ test/AddressC# make -j 4
 The proofs make heavy use of Diaframe proof-search and may take
 up to 20 minutes to check.
 
+# Structure of the Artifact
+
+This artifact contains the following files:
+
+ - `README.md`: this file
+ - `Dockerfile`: contains all installation commands for Ubuntu 22.04
+     In particular, you can find the precise version numbers of the
+     dependencies of the Coq proofs and the opam commands to install them.
+ - `bench-res-{system}-{processor}.txt`: These four files contain the
+     benchmark results we obtained running on the respective system
+     and processor.
+
+ - `bench.sh`: Our main benchmarking script.
+ - `daanx/pldi24-tree:1.0-{processor}.tar.gz`: Copies of the docker
+      containers created using `docker save`.
+ - `{benchmark}/{benchmark}-{td/bu}.{language-extension}`:
+      The entry point of the benchmark for the given language.
+      This file contains the main insertion algorithm and usually
+      imports the main benchmarking code from one of those files:
+ - `zip/ziptree.{h/kk}`, `splay/tree.{h/hs/kk}`, `mtr/tree.{h/hs/kk/ml}`,
+   `rbtree/rbtree.{h/kk}`: The definition of the benchmarking code
+      including random number generation. We have implemented
+      the same RNG `sfc32` for all languages.
+
+Aside from the benchmarks reported in the paper, we also include
+several experimental benchmarks that we used to get a better sense
+for the performance characteristics of our main benchmarks.
+These benchmarks are unsupported but included for completeness:
+
+ - `{benchmark}/{benchmark}-rec.{language-extension}`:
+      The typical recursive functional implementation for that language.
+      You can enable these benchmarks by adding "mtr-rec splay-rec rb-rec"
+      to the `benchmarks` variables on line 5 of `build.sh`
+
+ - `mtr/mtr-bu-rev.c`: Move-to-root trees implemented using pointer
+      reversal instead of parent pointers (as in `mtr/mtr-bu.c`)
+
+ - `mtr/mtr-cps.kk`, `mtr/mtr-defun.kk`, `mtr/mtr-spec.kk`:
+      Move-to-root trees in Koka using continuation-passing-style /
+      defunctionalized continuations / separate functions for the
+      smaller and bigger tree.
+
+ - `rbtree/rb-td2.kk`: A different implementation for top-down red-black
+      trees not reported in the paper. Notice also the commented out
+      version in `rbtree/rb-td.kk` -- it is not so easy to define fast
+      top-down redblack trees in a functional language!
+
+ - `zip-spec.kk`: Equal to `zip-rec.kk` where `unzip` is split
+      into a `smaller` and `bigger` function as in `mtr/mtr-spec.kk`
+
+ - `{benchmark}/*.icl`, `mtr/clean_env.c`,`mtr/CommandLine.{dcl/icl}`:
+      Implementations of our benchmarks for the Clean language.
+      You may attempt to run the Clean benchmarks by downloading
+      Clean 3.1 from https://wiki.clean.cs.ru.nl/Download_Clean,
+      adding `clm` to your path and adding "icl" to the
+      `languages` variable on line 7 of `build.sh`
+
+The proofs are contained in the `AddressC/` directory:
+
+ - `README.md`: A short introduction to AddressC
+ - `Makefile`: Makefile for the proofs (see above).
+ - `_CoqProject`, `Makefile.coq.conf`, `LICENSE`, `.gitignore`:
+    The usual boilerplate.
+ - `theories/ident.v`: A copy of the `ident_to_string!` tactic
+      due to the `coqutil` project.
+ - `theories/lang.v`: Tactics and notation for the AddressC language.
+ - `theories/{benchmark}.v`: Definition of the functional recursive,
+      bottom-up and top-down versions in Coq.
+ - `theories/{benchmark}_td.v`: Verification of the imperative
+      top-down algorithm of the respective benchmark.
+ - `theories/{benchmark}_bu.v`: Verification of the imperative
+      bottom-up algorithm of the respective benchmark.
+ - `theories/tree.v`, `theories/tree_bu.v`, `theories/tree_td.v`:
+      Useful lemmas common to both move-to-root and splay trees.
+      This includes the definition of constructor contexts.
+
+We also include some proof experiments not necessary for this paper:
+
+ - `theories/reverse.v`, `theories/tmap.v`: Verifications of the
+      imperative versions of simple functional programming idioms.
+ - `theories/append.v`, `theories/append_wand.v`:
+     Verification of an imperative append function due to
+     https://viper.ethz.ch/tutorial/#magic-wands
+     using contexts and implication wands respectively.
+
 # Notes
 
 ## Installing from Scratch
