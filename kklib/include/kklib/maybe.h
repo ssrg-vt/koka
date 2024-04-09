@@ -26,7 +26,7 @@ static inline kk_box_t kk_box_Nothing(void) {
 }
 
 static inline bool kk_box_is_Nothing(kk_box_t b) {
-  return (b.box == kk_datatype_from_tag(KK_TAG_NOTHING).dbox);
+  return (b.box == kk_datatype_from_tag(KK_TAG_NOTHING));
 }
 
 static inline bool kk_box_is_Just(kk_box_t b, kk_context_t* ctx) {

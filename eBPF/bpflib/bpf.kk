@@ -27,7 +27,7 @@ pub fun xdp_action_show( xdp : xdp_action ) : string
     XDP_TX -> "XDP_TX"
     XDP_REDIRECT -> "XDP_REDIRECT"
 
-pub struct xdp_md 
+pub ref struct xdp_md 
   data : int32       // pointer to beginning of the packet data
   data_end : int32  // pointer to the end of the packet data
 

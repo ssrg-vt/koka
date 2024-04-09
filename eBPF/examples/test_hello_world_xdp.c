@@ -29,7 +29,7 @@
 
 // value declarations
 
- __attribute__((section("xdp"), used)) static inline kk_eBPF_bpflib_bpf__xdp__action kk_eBPF_examples_hello__world__xdp_xdp__prog__simpl(kk_ref_t ictx, kk_context_t* _ctx) { /* forall<h> (ictx : ref<h,eBPF/bpflib/bpf/xdp_md>) -> eBPF/bpflib/bpf/xdp_action */ 
-  kk_ref_drop(ictx, _ctx);
+ __attribute__((section("xdp"), used)) static inline kk_eBPF_bpflib_bpf__xdp__action kk_eBPF_examples_hello__world__xdp_xdp__prog__simpl(kk_eBPF_bpflib_bpf__xdp__md ictx, kk_context_t* _ctx) { /* (ictx : eBPF/bpflib/bpf/xdp_md) -> eBPF/bpflib/bpf/xdp_action */ 
+  kk_datatype_ptr_dropn(ictx, (KK_I32(0)), _ctx);
   return kk_eBPF_bpflib_bpf__new_XDP__PASS(_ctx);
 }

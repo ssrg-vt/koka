@@ -165,9 +165,11 @@ typedef struct kk_integer_s {
 // A general datatype with constructors and singletons is either
 // an enumeration (with the lowest bit set as: 4*tag + 1) or a `kk_block_t*` pointer.
 // Isomorphic with boxed values.
-typedef struct kk_datatype_s {
-  kk_intb_t dbox;
-} kk_datatype_t;
+//typedef struct kk_datatype_s {
+//  kk_intb_t dbox;
+//} kk_datatype_t;
+
+typedef kk_intb_t kk_datatype_t;
 
 // Typedef to signify datatypes that have no singletons (and are always a pointer)
 typedef kk_datatype_t kk_datatype_ptr_t;
@@ -1016,20 +1018,20 @@ static inline kk_decl_const kk_datatype_t kk_datatype_from_ptr(kk_ptr_t p, kk_co
 }
 
 static inline kk_decl_const bool kk_datatype_eq(kk_datatype_t x, kk_datatype_t y) {
-  return (x.dbox == y.dbox);
+  return (x == y);
 }
 
 static inline kk_decl_const bool kk_datatype_is_ptr(kk_datatype_t d) {
-  return kk_is_ptr(d.dbox);
+  return kk_is_ptr(d);
 }
 
 static inline kk_decl_const  bool kk_datatype_is_singleton(kk_datatype_t d) {
-  return kk_is_value(d.dbox);
+  return kk_is_value(d);
 }
 
 static inline kk_decl_const kk_block_t* kk_datatype_as_ptr(kk_datatype_t d, kk_context_t* ctx) {
   kk_assert_internal(kk_datatype_is_ptr(d));
-  return kk_ptr_decode(d.dbox,ctx);
+  return kk_ptr_decode(d,ctx);
 }
 
 static inline kk_decl_pure kk_tag_t kk_datatype_ptr_tag(kk_datatype_t d, kk_context_t* ctx) {
@@ -1042,7 +1044,7 @@ static inline kk_decl_pure kk_tag_t kk_datatype_tag(kk_datatype_t d, kk_context_
     return kk_datatype_ptr_tag(d, ctx);
   }
   else {
-    return (kk_tag_t)kk_intf_decode(d.dbox,1);
+    return (kk_tag_t)kk_intf_decode(d,1);
   }
 }
 
@@ -1057,7 +1059,7 @@ static inline kk_decl_pure bool kk_datatype_has_tag(kk_datatype_t d, kk_tag_t t,
     return kk_datatype_ptr_has_tag(d, t, ctx);
   }
   else {
-    return (d.dbox == kk_datatype_from_tag(t).dbox);
+    return (d == kk_datatype_from_tag(t));
   }
 }
 
@@ -1066,7 +1068,7 @@ static inline kk_decl_pure bool kk_datatype_has_ptr_tag(kk_datatype_t d, kk_tag_
 }
 
 static inline kk_decl_pure bool kk_datatype_has_singleton_tag(kk_datatype_t d, kk_tag_t t) {
-  return (d.dbox == kk_datatype_from_tag(t).dbox);
+  return (d == kk_datatype_from_tag(t));
 }
 
 static inline bool kk_decl_pure kk_datatype_ptr_is_unique(kk_datatype_t d, kk_context_t* ctx) {
@@ -1184,13 +1186,13 @@ static inline kk_datatype_t kk_datatype_ptr_unbox(kk_box_t b) {
 }
 
 static inline kk_box_t kk_datatype_box(kk_datatype_t d) {
-  kk_box_t b = { d.dbox };
+  kk_box_t b = { d };
   return b;
 }
 
 static inline kk_box_t kk_datatype_ptr_box(kk_datatype_t d) {
   kk_assert_internal(kk_datatype_is_ptr(d));
-  kk_box_t b = { d.dbox };
+  kk_box_t b = { d };
   return b;
 }
 

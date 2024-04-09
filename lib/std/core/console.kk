@@ -82,12 +82,13 @@ pub fun string/println(s : string) : console ()
 pub fun show/println( x : a, ?show : a -> string ) : console ()
   printsln(x.show)
 
+/*
 // eBPF 
 extern bpf_xprintsln : ( message : string ) -> ()
   c  "kk_bpf_println"
 
 pub fun bpf_printk( message : string ) : ()
-  bpf_xprintsln(message)
+  bpf_xprintsln(message) */
 
 
 
