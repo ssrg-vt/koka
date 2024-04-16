@@ -27,9 +27,16 @@ fun hello_nt(): <console/console,div> ()
   while { True }
     println("hello")
 
-fun compute(x : ref<h,int32>) : <console/console,div, read<h>> ()
+fun compute(x : ref<h,int32>) : <console/console,div,read<h>> ()
   var r := !x
   while { r != 5.int32 } {
+    println("hello")
+    r := r + 1.int32
+  }
+
+fun compute2(x: ref<h,int32>, n : int32) : <console/console,div,read<h>> ()
+  var r := !x
+  while { r != n } {
     println("hello")
     r := r + 1.int32
   }
@@ -38,4 +45,4 @@ fun main()
   hello_ten()
   hello_nt()
   compute(ref(6.int32))
-  println("Hello from main")
+  compute2(ref(6.int32), 5.int32)
