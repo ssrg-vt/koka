@@ -201,25 +201,24 @@ pub type bpf_return_type
  * to in-kernel helper functions and for adjusting imm32 field in BPF_CALL
  * instructions after verifying
  */
-pub struct bpf_func_proto 
-  //fn_name : it says which bpf function 
-  gpl_only : bool 
-  pkt_access : bool
-  might_sleep : bool
-  ret_type : bpf_return_type 
-  arg1_type : bpf_arg_type
-  arg2_type : bpf_arg_type
-  arg3_type : bpf_arg_type
-  arg4_type : bpf_arg_type
-  arg5_type : bpf_arg_type
+pub value type bpf_func_proto 
+  Bpf_func_proto { gpl_only : bool; 
+                   pkt_access : bool; 
+                   might_sleep : bool;
+                   ret_type : bpf_return_type; 
+                   arg1_type : bpf_arg_type;
+                   arg2_type : bpf_arg_type;
+                   arg3_type : bpf_arg_type;
+                   arg4_type : bpf_arg_type;
+                   arg5_type : bpf_arg_type }
 
 // structure used by BPF_MAP_CREATE COMMAND 
-pub struct bpf_attr 
-  map_type : int32      //one of enum bpf_map_type (it should contain the integer associated with constructor of enum type "bpf_map_type")
-  key_size : int32      //size of key in bytes
-  value_size : int32    //size of value in bytes
-  max_entries : int32   //max number of entries in a map
-  map_flags : int32     //prealloc or not
+pub value type bpf_attr 
+  Bpf_attr { map_type : int32;      //one of enum bpf_map_type (it should contain the integer associated with constructor of enum type "bpf_map_type")
+             key_size : int32;      //size of key in bytes
+             value_size : int32;    //size of value in bytes
+             max_entries : int32;   //max number of entries in a map
+             map_flags : int32 }    //prealloc or not
 
 
 /* Register Names */
