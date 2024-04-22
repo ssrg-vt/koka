@@ -17,7 +17,7 @@ pub sec "xdp" fun xdp_prog_simpl(ictx : xdp_md) : xdp_action {
 }
 
 pub fun main() {
-   val ictx1 = Xdp_md(10.int32, 20.int32)
+   val ictx1 = Xdp_md(10.int32, 20.int32, 30.int32, 40.int32, 50.int32, 60.int32)
    val r = xdp_prog_simpl(ictx1)
    println("Successful with: " ++ r.xdp_action_show)
 }

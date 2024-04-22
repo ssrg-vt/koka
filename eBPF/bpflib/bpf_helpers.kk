@@ -20,3 +20,6 @@ pub fun main () : io () {
 
 */
 
+pub fun bpf_map_lookup_elem () 
+  println("Hello from bpf map lookup")
+
