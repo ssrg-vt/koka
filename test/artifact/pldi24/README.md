@@ -86,6 +86,16 @@ variants. Eventually the bench provides a summary in absolute runtimes (and rss)
 and normalized runtimes relative to the Koka variant (`kk`).
 The above results are on Ubuntu 22.0.4 with 16-core AMD 7950X @4.5Ghz (outside Docker).
 
+### Troubleshooting
+
+We observed that on some machines the Koka benchmarks are terminated by signal 4.
+The probable reason for the signal 4 is that we pre-built all benchmarks with the -march=native flag to the C compiler
+(this can be important for benchmarks like the ziptree as these need fast bit-count operations).
+By doing a full rebuild everything should now be built using your particular architecture and hopefully work as intended:
+```
+test#  rm -rf .koka
+test#  ./bench.sh build allb
+```
 
 # Step-by-step Guide
 

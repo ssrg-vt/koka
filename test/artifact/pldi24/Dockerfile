@@ -54,7 +54,7 @@ RUN ./bench.sh build allb
 
 # Download proofs and their dependencies
 WORKDIR /artifact/koka/test/artifact/pldi24
-RUN git clone https://github.com/koka-lang/AddressC
+RUN git clone -b pldi24-artifact --depth 1 https://github.com/koka-lang/AddressC
 RUN apt-get install -y --no-install-recommends opam
 RUN opam init -y
 RUN opam repo add coq-released https://coq.inria.fr/opam/released
