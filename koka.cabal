@@ -80,6 +80,8 @@ library
       Core.Uniquefy
       Core.UnReturn
       Core.Unroll
+      Ebpf.Bpf
+      Ebpf.Bpf_checks
       Interpreter.Command
       Interpreter.Interpret
       Kind.Assumption
