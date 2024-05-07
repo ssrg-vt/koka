@@ -794,7 +794,7 @@ kk_string_t kk_string_to_upper(kk_string_t str, kk_context_t* ctx) {
   kk_ssize_t len;
   const uint8_t* s = kk_string_buf_borrow(str, &len, ctx);
   kk_string_t tstr;
-  if (kk_datatype_is_unique(str.bytes, ctx)) {
+  if (kk_datatype_is_unique(str, ctx)) {
     tstr = str;  // update in-place
   }
   else {
@@ -806,7 +806,7 @@ kk_string_t kk_string_to_upper(kk_string_t str, kk_context_t* ctx) {
   for (kk_ssize_t i = 0; i < len; i++) {
     t[i] = kk_ascii_toupper(s[i]);
   }
-  if (!kk_datatype_eq(str.bytes, tstr.bytes)) kk_string_drop(str, ctx);  // drop if not reused in-place
+  if (!kk_datatype_eq(str, tstr)) kk_string_drop(str, ctx);  // drop if not reused in-place
   return tstr;
 }
 
@@ -818,7 +818,7 @@ kk_string_t  kk_string_to_lower(kk_string_t str, kk_context_t* ctx) {
   kk_ssize_t len;
   const uint8_t* s = kk_string_buf_borrow(str, &len, ctx);
   kk_string_t tstr;
-  if (kk_datatype_is_unique(str.bytes, ctx)) {
+  if (kk_datatype_is_unique(str, ctx)) {
     tstr = str;  // update in-place
   }
   else {
@@ -830,7 +830,7 @@ kk_string_t  kk_string_to_lower(kk_string_t str, kk_context_t* ctx) {
   for (kk_ssize_t i = 0; i < len; i++) {
     t[i] = kk_ascii_tolower(s[i]);
   }
-  if (!kk_datatype_eq(str.bytes, tstr.bytes)) kk_string_drop(str, ctx);  // drop if not reused in-place
+  if (!kk_datatype_eq(str, tstr)) kk_string_drop(str, ctx);  // drop if not reused in-place
   return tstr;
 }
 

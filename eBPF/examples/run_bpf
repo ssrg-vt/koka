@@ -1,1 +1,1 @@
-clang -target bpf -I/usr/include/x86_64-linux-gnu -I/home/criudsm/Desktop/koka/kklib/include -g -o test_hello_world_xdp.o -c test_hello_world_xdp.c
+clang -target bpf -I/usr/include/x86_64-linux-gnu -I/home/swarnp/research/koka/kklib/include -I/home/swarnp/research/koka/.koka/v3.1.0/gcc-debug-33523e -g -o eBPF/examples/test_hello_world_xdp.bpf.o -c eBPF/examples/test_hello_world_xdp.bpf.c
