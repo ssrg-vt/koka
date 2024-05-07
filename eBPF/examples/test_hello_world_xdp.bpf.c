@@ -46,28 +46,52 @@
 
 //#include <linux/bpf.h>
 
-enum kk_eBPF_bpflib_bpf__xdp__action_e {
+/*enum kk_eBPF_bpflib_bpf__xdp__action_e {
   kk_eBPF_bpflib_bpf_XDP__ABORTED,
   kk_eBPF_bpflib_bpf_XDP__DROP,
   kk_eBPF_bpflib_bpf_XDP__PASS,
   kk_eBPF_bpflib_bpf_XDP__TX,
   kk_eBPF_bpflib_bpf_XDP__REDIRECT
- };
+ };*/
 
-  __attribute__((section("xdp"), used)) /*static inline*/ int kk_eBPF_examples_hello__world__xdp_xdp__prog__simpl(void *ictx) {
-   return kk_eBPF_bpflib_bpf_XDP__PASS;
- }
+ 
+ // __attribute__((section("xdp"), used)) /*static inline*/ int kk_eBPF_examples_hello__world__xdp_xdp__prog__simpl(void *ictx) {
+ //  return kk_eBPF_bpflib_bpf_XDP__PASS;
+ //} 
 
-/*#include <linux/bpf.h>
-#include <bpf/bpf_helpers.h>
+ enum kk_eBPF_bpflib_bpf__xdp__action_e {
+  kk_eBPF_bpflib_bpf_XDP__PASS,
+  kk_eBPF_bpflib_bpf_XDP__ABORTED,
+  kk_eBPF_bpflib_bpf_XDP__DROP,
+  kk_eBPF_bpflib_bpf_XDP__TX,
+  kk_eBPF_bpflib_bpf_XDP__REDIRECT
+};
+typedef int kk_eBPF_bpflib_bpf__xdp__action;
 
-int counter = 0;
+typedef int* kk_eBPF_bpflib_bpf__xdp__md;
+struct kk_eBPF_bpflib_bpf_Xdp__md {
+  //struct kk_eBPF_bpflib_bpf__xdp__md_s _base;
+  int data;
+  int data__end;
+  int data__meta;
+  int ingress__ifindex;
+  int rx__queue__index;
+  int egress__ifindex;
+};
 
-SEC("xdp")
-int test_hello_world_xdp(void *ctx) {
-    bpf_printk("%d", counter);
-    counter++;
-    return XDP_PASS;
+ __attribute__((section("xdp"), used)) /*static inline*/ kk_eBPF_bpflib_bpf__xdp__action kk_eBPF_examples_hello__world__xdp_xdp__prog__simpl(kk_eBPF_bpflib_bpf__xdp__md ictx, kk_eBPF_bpflib_bpf__xdp__md _ctx) { /* (ictx : eBPF/bpflib/bpf/xdp_md) -> eBPF/bpflib/bpf/xdp_action */ 
+  //kk_datatype_ptr_dropn(ictx, (KK_I32(0)), _ctx);
+  return kk_eBPF_bpflib_bpf_XDP__PASS;
 }
 
-char LICENSE[] SEC("license") = "Dual BSD/GPL";*/
+/* test_hello_world_xdp.bpf.o: ELF 64-bit LSB relocatable, eBPF, version 1 (SYSV), with debug_info, not stripped */
+/* Assembly 
+test_hello_world_xdp.bpf.o:     file format elf64-bpf
+
+Disassembly of section xdp:
+
+0000000000000000 <kk_eBPF_examples_hello__world__xdp_xdp__prog__simpl>:
+;   return kk_eBPF_bpflib_bpf_XDP__PASS;
+       0:       b7 00 00 00 00 00 00 00 r0 = 0
+       1:       95 00 00 00 00 00 00 00 exit
+*/
