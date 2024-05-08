@@ -59,6 +59,8 @@
  //  return kk_eBPF_bpflib_bpf_XDP__PASS;
  //} 
 
+ #include <inttypes.h> // Need to add this for aliases of uint32_t: typedef __uint32_t uint32_t and typedef unsigned int __uint32_t
+
  enum kk_eBPF_bpflib_bpf__xdp__action_e {
   kk_eBPF_bpflib_bpf_XDP__PASS,
   kk_eBPF_bpflib_bpf_XDP__ABORTED,
@@ -66,7 +68,8 @@
   kk_eBPF_bpflib_bpf_XDP__TX,
   kk_eBPF_bpflib_bpf_XDP__REDIRECT
 };
-typedef int kk_eBPF_bpflib_bpf__xdp__action;
+
+typedef uint32_t kk_eBPF_bpflib_bpf__xdp__action;
 
 typedef int* kk_eBPF_bpflib_bpf__xdp__md;
 struct kk_eBPF_bpflib_bpf_Xdp__md {

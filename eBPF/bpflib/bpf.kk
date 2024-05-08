@@ -4,7 +4,7 @@ import std/core/types
 import std/core/int
 import std/num/int32
 
-/* https://elixir.bootlin.com/linux/v4.9/source/include/uapi/linux/bpf.h */
+/* https://elixir.bootlin.com/linux/v6.9-rc7/source/include/uapi/linux/bpf.h */
 
 /* User return code for XDP prog type:
    A valid XDP program must return one of these valid field. 

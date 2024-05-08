@@ -460,8 +460,8 @@ genTypeDefPre (Data info isExtend)
        if (dataRepr == DataEnum)
         then let enumIntTp = case (dataInfoDef info) of
                                DataDefValue (ValueRepr n 0 _)
-                                -> if (n <= 1) then "uint8_t"
-                                   else if (n <= 2) then "uint16_t"
+                                -> if (n <= 1) then "uint32_t" -- eBPF program deals with many enum types which should be always int instead of char
+                                   else if (n <= 2) then "uint32_t"
                                    else if (n <= 4) then "uint32_t"
                                    else "uint64_t"
                                _ -> "kk_intb_t"  -- should not happen?
