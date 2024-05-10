@@ -71,7 +71,8 @@
 
 typedef uint32_t kk_eBPF_bpflib_bpf__xdp__action;
 
-typedef int* kk_eBPF_bpflib_bpf__xdp__md;
+//typedef void* kk_datatype_ptr_t;
+//typedef kk_datatype_ptr_t kk_eBPF_bpflib_bpf__xdp__md;
 struct kk_eBPF_bpflib_bpf_Xdp__md {
   //struct kk_eBPF_bpflib_bpf__xdp__md_s _base;
   int data;
@@ -81,8 +82,10 @@ struct kk_eBPF_bpflib_bpf_Xdp__md {
   int rx__queue__index;
   int egress__ifindex;
 };
+typedef struct kk_eBPF_bpflib_bpf_Xdp__md* kk_eBPF_bpflib_bpf__xdp__md;
 
- __attribute__((section("xdp"), used)) /*static inline*/ kk_eBPF_bpflib_bpf__xdp__action kk_eBPF_examples_hello__world__xdp_xdp__prog__simpl(kk_eBPF_bpflib_bpf__xdp__md ictx, kk_eBPF_bpflib_bpf__xdp__md _ctx) { /* (ictx : eBPF/bpflib/bpf/xdp_md) -> eBPF/bpflib/bpf/xdp_action */ 
+
+ __attribute__((section("xdp"), used)) static inline kk_eBPF_bpflib_bpf__xdp__action kk_eBPF_examples_hello__world__xdp_xdp__prog__simpl(kk_eBPF_bpflib_bpf__xdp__md ictx, kk_eBPF_bpflib_bpf__xdp__md _ctx) { /* (ictx : eBPF/bpflib/bpf/xdp_md) -> eBPF/bpflib/bpf/xdp_action */ 
   //kk_datatype_ptr_dropn(ictx, (KK_I32(0)), _ctx);
   return kk_eBPF_bpflib_bpf_XDP__PASS;
 }
