@@ -158,9 +158,11 @@ typedef struct kk_box_s {
 
 // An integer is either a small int (as: 4*i + 1) or a `kk_bigint_t*` pointer. Isomorphic with boxed values.
 // See `integer.h` for definitions.
-typedef struct kk_integer_s {
-  kk_intb_t ibox;
-} kk_integer_t;
+//typedef struct kk_integer_s {
+//  kk_intb_t ibox;
+//} kk_integer_t;
+
+typedef long kk_integer_t;
 
 // A general datatype with constructors and singletons is either
 // an enumeration (with the lowest bit set as: 4*tag + 1) or a `kk_block_t*` pointer.

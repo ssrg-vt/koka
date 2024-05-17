@@ -191,21 +191,21 @@ typedef int8_t kk_smallint_t;
 #define KK_SMALLINT_MIN   (-KK_SMALLINT_MAX - 1)
 
 static inline bool kk_is_smallint(kk_integer_t i) {
-  return kk_is_value(i.ibox);
+  return kk_is_value(i);
 }
 
 static inline bool kk_is_bigint(kk_integer_t i) {
-  return kk_is_ptr(i.ibox);
+  return kk_is_ptr(i);
 }
 
 static inline kk_ptr_t _kk_integer_ptr(kk_integer_t i, kk_context_t* ctx) {
   kk_assert_internal(kk_is_bigint(i));
-  return kk_ptr_decode(i.ibox,ctx);  
+  return kk_ptr_decode(i,ctx);  
 }
 
 static inline kk_intf_t kk_smallint_from_integer(kk_integer_t i) {  // use for known small ints
   kk_assert_internal(kk_is_smallint(i));
-  return kk_intf_decode(i.ibox,1);
+  return kk_intf_decode(i,1);
 }
 
 static inline kk_integer_t kk_integer_from_small(kk_intf_t i) {   // use for known small int constants (at most 14 bits)
@@ -222,7 +222,7 @@ static inline bool kk_is_integer(kk_integer_t i) {
 static inline bool kk_are_smallints(kk_integer_t i, kk_integer_t j) {
   kk_assert_internal(kk_is_integer(i) && kk_is_integer(j));
   #if KK_TAG_VALUE == 1
-  return kk_is_value(i.ibox & j.ibox);
+  return kk_is_value(i & j);
   #else
   return (kk_is_smallint(i) && kk_is_smallint(j));
   #endif
@@ -230,7 +230,7 @@ static inline bool kk_are_smallints(kk_integer_t i, kk_integer_t j) {
 
 static inline bool kk_integer_small_eq(kk_integer_t x, kk_integer_t y) {
   kk_assert_internal(kk_are_smallints(x, y));
-  return (x.ibox == y.ibox);
+  return (x == y);
 }
 
 #define kk_integer_zero     (kk_integer_from_small(0))
@@ -259,7 +259,7 @@ static inline bool kk_integer_is_minus_one_borrow(kk_integer_t x) {
 // Isomorphic with boxed values
 static inline kk_box_t kk_integer_box(kk_integer_t i, kk_context_t* ctx) { 
   kk_unused(ctx);
-  kk_box_t b = { i.ibox };
+  kk_box_t b = { i };
   return b;
 }
 static inline kk_integer_t kk_integer_unbox(kk_box_t b, kk_context_t* ctx) {
@@ -467,7 +467,7 @@ static kk_intf_t _kk_integer_value(kk_integer_t i) {
   #if KK_INT_ARITHMETIC == KK_INT_USE_TAGOVF
   kk_assert_internal(kk_is_smallint(i));  
   #endif
-  return (kk_intf_t)i.ibox;
+  return (kk_intf_t)i;
 }
 
 static kk_integer_t _kk_new_integer(kk_intf_t i) {

@@ -542,4 +542,4 @@ pub type neg_pos
   con Neg(pos_elm: pos)
 
 
-
+pub type arrayty<a,int>
