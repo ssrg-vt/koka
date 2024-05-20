@@ -177,6 +177,7 @@ data DataInfo = DataInfo{ dataInfoSort    :: !DataKind
                         , dataInfoDef     :: !DataDef  -- value(raw,scan), normal, rec, open, linear
                         , dataInfoEffect  :: !DataEffect
                         , dataInfoVis     :: !Visibility
+                        , dataInfoSec :: !(Maybe String)
                         , dataInfoDoc     :: !String
                         }
 

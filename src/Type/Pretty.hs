@@ -243,7 +243,7 @@ ppDataInfo env showBody isExtend dataInfo
 commaSep = hsep . punctuate comma
 
 
-prettyDataInfo env0 showBody publicOnly isExtend info@(DataInfo datakind name kind args cons range datadef dataEff vis doc)
+prettyDataInfo env0 showBody publicOnly isExtend info@(DataInfo datakind name kind args cons range datadef dataEff vis seca doc)
   = if (publicOnly && isPrivate vis) then empty else
     (prettyComment env0 doc $
       (if publicOnly then empty else ppVis env0 vis) <.>

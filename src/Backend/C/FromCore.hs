@@ -482,7 +482,7 @@ genTypeDefPre (Data info isExtend)
                            then (text "typedef kk_datatype_t" <+> ppName (typeClassName name) <.> semi)
                            else ( -- text "typedef struct" <+> ppName (typeClassName name) <.> text "_s*" <+> ppName (typeClassName name) <.> semi))
                                  text "typedef kk_datatype_ptr_t" <+> ppName (typeClassName name) <.> semi))
-
+                                 
 genTypeDefPost:: TypeDef -> Asm ()
 genTypeDefPost (Synonym synInfo)
   = return ()

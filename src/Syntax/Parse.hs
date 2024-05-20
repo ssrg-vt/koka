@@ -247,17 +247,17 @@ program source
 
 pmodule :: Source -> LexParser UserProgram
 pmodule source
-  = do (vis,doc,name,nameRng) <- pmoduleDecl (sourceName source)
-       programBody vis source name nameRng doc
+  = do (vis,seca,doc,name,nameRng) <- pmoduleDecl (sourceName source)
+       programBody vis seca source name nameRng doc
 
-pmoduleDecl :: FilePath -> LexParser (Visibility,String,ModuleName,Range)
+pmoduleDecl :: FilePath -> LexParser (Visibility,Maybe String,String,ModuleName,Range)
 pmoduleDecl fpath
   = do (_,doc) <- dockeyword "module"
        (name,rng) <- modulepath
-       return (Private,doc,name,rng)
+       return (Private,Nothing,doc,name,rng)
   <|>
     let mname = pathToModuleName (noexts (basename fpath))
-    in seq mname $ return (Public, "", mname, rangeNull)
+    in seq mname $ return (Public, Nothing, "", mname, rangeNull)
 
 
 -----------------------------------------------------------
@@ -267,7 +267,7 @@ pmoduleDecl fpath
 pmoduleDeps :: Source -> LexParser [Import]
 pmoduleDeps source
   = do many semiColon
-       (vis,doc,modname,nameRng) <- pmoduleDecl (sourceName source)
+       (vis,seca,doc,modname,nameRng) <- pmoduleDecl (sourceName source)
        imports <- pimportDecls
        return (includeStdCore modname imports)
        -- no eof.. try to parse as far as possible
@@ -289,13 +289,13 @@ semis0 p
 -----------------------------------------------------------
 -- Program body
 -----------------------------------------------------------
-programBody :: Visibility -> Source -> Name -> Range -> String -> LexParser UserProgram
-programBody vis source modName nameRange doc
+programBody :: Visibility -> Maybe String -> Source -> Name -> Range -> String -> LexParser UserProgram
+programBody vis seca source modName nameRange doc
   = do many semiColon
        (imports, fixDefss, topDefss)
           <- braced (do imps <- semis importDecl
                         fixs <- semis fixDecl
-                        tdefs <- semis (topdef vis)
+                        tdefs <- semis (topdef vis seca)
                         return (imps,fixs,tdefs))
        many semiColon
        let (defs,typeDefs,externals) = splitTopDefs (concat topDefss)
@@ -342,15 +342,15 @@ splitTopDefs ds
           DefExtern edef-> fold (defs, tdefs, edef:edefs) ds
 
 
-topdef :: Visibility -> LexParser [TopDef]
-topdef vis
+topdef :: Visibility -> Maybe String -> LexParser [TopDef]
+topdef vis seca 
   = do def <- pureDecl True vis
        return [DefValue def]
   <|>
     do tdef <- aliasDecl vis
        return [DefType tdef]
   <|>
-    do (tdef,cdefs) <- typeDecl vis
+    do (tdef,cdefs) <- typeDecl vis 
        return ([DefType tdef] ++ map DefValue cdefs)
   <|>
     do effectDecl vis
@@ -632,6 +632,10 @@ dataTypeDecl dvis =
             do (vis,vrng) <- visibility dvis
                x <- typeDeclKind
                return (vis,vis,vrng,x))
+      seca <- optionMaybe $ do
+                              specialId "sect"
+                              value <- stringLit
+                              return value
       tbind <- if isExtend
                 then do (qid,rng) <- qtypeid
                         return (\kind -> TypeBinder qid kind rng rng)
@@ -642,7 +646,7 @@ dataTypeDecl dvis =
       (cs,crng)    <- semiBracesRanged (constructor defvis tpars resTp) <|> return ([],rangeNull)
       let (constrs,creatorss) = unzip cs
           range   = combineRanges [vrng,trng, getRange (tbind kind),prng,crng]
-      return (DataType name tpars constrs range vis typeSort ddef DataNoEffect isExtend doc, concat creatorss)
+      return (DataType name tpars constrs range vis typeSort ddef DataNoEffect isExtend doc (fmap fst seca), concat creatorss)
    where
     tpVar tb = TpVar (tbinderName tb) (tbinderRange tb)
     tpCon tb = TpCon (tbinderName tb) (tbinderRange tb)
@@ -659,7 +663,10 @@ structDecl dvis =
                                <|> do { return DataDefAuto }
              (trng,doc) <- dockeyword "struct"
              return (vis,dvis,ddef,rng,trng,doc))
-
+      seca <- optionMaybe $ do
+                              specialId "sec"
+                              value <- stringLit
+                              return value
       tbind <- tbinderDef
       tpars <- angles tbinders <|> return []
       let name = tbind KindNone
@@ -669,7 +676,7 @@ structDecl dvis =
       let (tid,rng) = getRName name
           conId     = toConstructorName tid
           (usercon,creators) = makeUserCon conId tpars resTp [] pars rng (combineRange rng prng) defvis doc
-      return (DataType name tpars [usercon] (combineRanges [vrng,trng,rng,prng]) vis Inductive ddef DataNoEffect False doc, creators)
+      return (DataType name tpars [usercon] (combineRanges [vrng,trng,rng,prng]) vis Inductive ddef DataNoEffect False doc (fmap fst seca), creators)
 
 tpVar tb = TpVar (tbinderName tb) (tbinderRange tb)
 tpCon tb = TpCon (tbinderName tb) (tbinderRange tb)
@@ -1005,7 +1012,7 @@ makeEffectDecl decl =
       hndCon     = UserCon (toHandlerConName hndName) [] [(Private,fld) | fld <- hndFields] Nothing krng grng vis ""
       hndTpDecl  = DataType hndTpName (tpars {- tparsNonScoped -} ++ [hndEffTp,hndResTp]) [hndCon] grng vis sort
                    DataDefNormal (DataEffect isInstance singleShot)
-                   False docx -- ("// handlers for the " ++ docEffect)
+                   False docx Nothing -- ("// handlers for the " ++ docEffect) 
 
       -- declare the handle function
 

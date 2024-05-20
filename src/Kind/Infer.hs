@@ -376,7 +376,7 @@ bindTypeDef tdef -- extension
   where
     isExtend =
       case tdef of
-        (DataType newtp args constructors range vis sort ddef dataEff isExtend doc) -> isExtend
+        (DataType newtp args constructors range vis sort ddef dataEff isExtend doc seca) -> isExtend
         _ -> False
 
 bindTypeBinder :: TypeBinder UserKind -> KInfer (TypeBinder InfKind)
@@ -664,7 +664,7 @@ infTypeDef (tbinder, Synonym syn args tp range vis doc)
        tbinder' <- unifyBinder tbinder syn range infgamma kind
        return (Synonym tbinder' infgamma tp' range vis doc)
 
-infTypeDef (tbinder, td@(DataType newtp args constructors range vis sort ddef dataEff isExtend doc))
+infTypeDef (tbinder, td@(DataType newtp args constructors range vis sort ddef dataEff isExtend doc seca))
   = do infgamma <- mapM bindTypeBinder args
        constructors' <-  extendInfGamma infgamma (mapM infConstructor constructors)
        -- todo: unify extended datatype kind with original
@@ -673,7 +673,7 @@ infTypeDef (tbinder, td@(DataType newtp args constructors range vis sort ddef da
        if not isExtend then return ()
         else do (qname,kind,_) <- findInfKind (tbinderName newtp) (tbinderRange newtp)
                 unify (Check "extended type must have the same kind as the open type" (tbinderRange newtp) ) (tbinderRange newtp) (typeBinderKind tbinder') kind
-       return (DataType tbinder' infgamma constructors' range vis sort ddef dataEff isExtend doc)
+       return (DataType tbinder' infgamma constructors' range vis sort ddef dataEff isExtend doc seca)
 
 unifyBinder tbinder defbinder range infgamma reskind
  = do let kind = infKindFunN (map typeBinderKind infgamma) reskind
@@ -851,7 +851,7 @@ resolveTypeDef isRec recNames (Synonym syn params tp range vis doc)
     kindArity (KApp (KApp kcon k1) k2)  | kcon == kindArrow = k1 : kindArity k2
     kindArity _ = []
 
-resolveTypeDef isRec recNames (DataType newtp params constructors range vis sort ddef dataEff isExtend doc)
+resolveTypeDef isRec recNames (DataType newtp params constructors range vis sort ddef dataEff isExtend doc seca)
   = do -- trace ("datatype: " ++ show(tbinderName newtp) ++ " " ++ show isExtend ++ ", doc: " ++ doc) $ return ()
        newtp' <- if isExtend
                   then do (qname,ikind,_) <- findInfKind (tbinderName newtp) (tbinderRange newtp)
@@ -903,7 +903,7 @@ resolveTypeDef isRec recNames (DataType newtp params constructors range vis sort
           <- createDataDef emitError emitWarning lookupDataInfo
                 platform qname resultHasKindStar isRec sort extraFields ddef conInfos0
 
-       let dataInfo = DataInfo sort (getName newtp') (typeBinderKind newtp') typeVars conInfos1 range ddef1 dataEff vis doc
+       let dataInfo = DataInfo sort (getName newtp') (typeBinderKind newtp') typeVars conInfos1 range ddef1 dataEff vis seca doc
 
        assertion ("Kind.Infer.resolveTypeDef: assuming value struct tag but not inferred as such " ++ show (ddef,ddef1))
                  ((willNeedStructTag && Core.needsTagField (fst (Core.getDataRepr dataInfo))) || not willNeedStructTag) $ return ()

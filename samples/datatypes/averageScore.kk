@@ -7,6 +7,8 @@ struct student
   name : string
   score : int 
 
+pub sect "foo" type foo
+
 fun get_name (s : ref<h,student>) : <read<h>> int {
   val r1 = !s
   val r2 = r1.score
