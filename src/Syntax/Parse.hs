@@ -633,7 +633,7 @@ dataTypeDecl dvis =
                x <- typeDeclKind
                return (vis,vis,vrng,x))
       seca <- optionMaybe $ do
-                              specialId "sect"
+                              specialId "sec"
                               value <- stringLit
                               return value
       tbind <- if isExtend
@@ -675,7 +675,7 @@ structDecl dvis =
       (pars,prng)  <- conPars defvis
       let (tid,rng) = getRName name
           conId     = toConstructorName tid
-          (usercon,creators) = makeUserCon conId tpars resTp [] pars rng (combineRange rng prng) defvis doc
+          (usercon,creators) = makeUserCon conId tpars resTp [] pars rng (combineRange rng prng) defvis doc (fmap fst seca)
       return (DataType name tpars [usercon] (combineRanges [vrng,trng,rng,prng]) vis Inductive ddef DataNoEffect False doc (fmap fst seca), creators)
 
 tpVar tb = TpVar (tbinderName tb) (tbinderRange tb)
@@ -730,13 +730,17 @@ constructor defvis foralls resTp
                                                      krng <- keyword "con" <|> return rangeNull
                                                      (c,(crng,doc)) <- docconid
                                                      return (v,(krng,doc),(c,crng))
+       seca <- optionMaybe $ do
+                              specialId "sec"
+                              value <- stringLit
+                              return value
        exists    <- typeparams
        (pars,prng) <- conPars vis
-       return (makeUserCon con foralls resTp exists pars rng (combineRanges [vrng,rng0,rng,getRange exists,prng]) vis doc)
+       return (makeUserCon con foralls resTp exists pars rng (combineRanges [vrng,rng0,rng,getRange exists,prng]) vis doc (fmap fst seca))
 
-makeUserCon :: Name -> [UserTypeBinder] -> UserType -> [UserTypeBinder] -> [(Visibility,ValueBinder UserType (Maybe UserExpr))] -> Range -> Range -> Visibility -> String -> (UserCon UserType UserType UserKind, [UserDef])
-makeUserCon con foralls resTp exists pars nameRng rng vis doc
-  = (UserCon con exists conParams Nothing nameRng rng vis doc
+makeUserCon :: Name -> [UserTypeBinder] -> UserType -> [UserTypeBinder] -> [(Visibility,ValueBinder UserType (Maybe UserExpr))] -> Range -> Range -> Visibility -> String -> Maybe String -> (UserCon UserType UserType UserKind, [UserDef])
+makeUserCon con foralls resTp exists pars nameRng rng vis doc seca
+  = (UserCon con exists conParams Nothing nameRng rng vis doc seca
     , if (any (isJust . binderExpr . snd) pars) then [creator] else []
     )
   where
@@ -1009,7 +1013,7 @@ makeEffectDecl decl =
       hndFieldCfc= ValueBinder (newHiddenName "cfc")  (TpCon nameTpInt krng) Nothing krng krng -- first field is the control-flow-context for the handler
       hndFields  = [hndFieldCfc] ++ opFields
 
-      hndCon     = UserCon (toHandlerConName hndName) [] [(Private,fld) | fld <- hndFields] Nothing krng grng vis ""
+      hndCon     = UserCon (toHandlerConName hndName) [] [(Private,fld) | fld <- hndFields] Nothing krng grng vis "" Nothing
       hndTpDecl  = DataType hndTpName (tpars {- tparsNonScoped -} ++ [hndEffTp,hndResTp]) [hndCon] grng vis sort
                    DataDefNormal (DataEffect isInstance singleShot)
                    False docx Nothing -- ("// handlers for the " ++ docEffect) 

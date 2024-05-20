@@ -683,14 +683,14 @@ unifyBinder tbinder defbinder range infgamma reskind
 typeBinderKind (TypeBinder name kind _ _) = kind
 
 infConstructor :: UserCon UserType UserType UserKind -> KInfer (UserCon (KUserType InfKind) UserType InfKind)
-infConstructor (UserCon name exist params mbresult rngName rng vis doc)
+infConstructor (UserCon name exist params mbresult rngName rng vis doc seca)
   = do infgamma <- mapM bindTypeBinder exist
        params'  <- extendInfGamma infgamma (mapM infConValueBinder params)
        result'  <- case mbresult of
                      Nothing -> return Nothing
                      Just tp -> do tp' <- extendInfGamma infgamma $ infUserType infKindStar (Check "Constructor results must be values" rng) tp
                                    return (Just tp')
-       return (UserCon name infgamma params' result' rngName rng vis doc)
+       return (UserCon name infgamma params' result' rngName rng vis doc seca)
 
 infConValueBinder :: (Visibility,ValueBinder UserType (Maybe (Expr UserType))) -> KInfer (Visibility,ValueBinder (KUserType InfKind) (Maybe (Expr UserType)))
 infConValueBinder (vis,ValueBinder name tp mbExpr nameRng rng)
@@ -925,7 +925,7 @@ resolveTypeDef isRec recNames (DataType newtp params constructors range vis sort
        addRangeInfo range (Decl (show sort) (getName newtp') (mangleTypeName (getName newtp')) Nothing)
        return (Core.Data dataInfo isExtend)
   where
-    conVis (UserCon name exist params result rngName rng vis _) = vis
+    conVis (UserCon name exist params result rngName rng vis _ seca) = vis
 
 occursNegativeCon :: [Name] -> ConInfo -> Bool
 occursNegativeCon names conInfo
@@ -981,7 +981,7 @@ resolveKind infkind
     resolve (KIApp k1 k2) = KApp (resolve k1) (resolve k2)
 
 resolveConstructor :: Name -> DataKind -> Bool -> Type -> [TypeVar] -> M.NameMap TypeVar -> UserCon (KUserType InfKind) UserType InfKind -> KInfer (UserCon Type Type Kind, ConInfo)
-resolveConstructor typeName typeSort isSingleton typeResult typeParams idmap (UserCon name exist params mbResult rngName rng vis doc)
+resolveConstructor typeName typeSort isSingleton typeResult typeParams idmap (UserCon name exist params mbResult rngName rng vis doc seca)
   = do qname  <- qualifyDef name
        exist' <- mapM (resolveTypeBinder doc) exist
        existVars <- mapM (\ename -> freshTypeVar ename Bound) exist'
@@ -1000,7 +1000,7 @@ resolveConstructor typeName typeSort isSingleton typeResult typeParams idmap (Us
        --                           addError rng (makeMsg nameDoc)
        platform <- getPlatform
        -- (orderedFields,vrepr) <- orderConFields emitError lookupDataInfo platform (if isOpen then 1 else 0) fields
-       return (UserCon qname exist' params' (Just result') rngName rng vis doc
+       return (UserCon qname exist' params' (Just result') rngName rng vis doc seca
               ,ConInfo qname typeName typeParams existVars
                   fields
                   scheme

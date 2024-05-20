@@ -69,7 +69,7 @@ instance HasFreeTypes a => HasFreeTypes (Maybe a) where
   freeTypes (Just x) = freeTypes x
 
 instance (HasFreeTypes t) => HasFreeTypes (UserCon t u k) where
-  freeTypes (UserCon name exist params result nameRng rng vis doc)
+  freeTypes (UserCon name exist params result nameRng rng vis doc seca)
     = freeTypes (map snd params) `S.union` freeTypes result
 
 instance (HasFreeTypes t) => HasFreeTypes (ValueBinder t e) where
