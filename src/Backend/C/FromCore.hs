@@ -569,8 +569,14 @@ genConstructorType info dataRepr (con,conRepr,conFields,scanCount) =
        -> return () -- represented as an enum
     -- _ | null conFields && (dataRepr < DataNormal && not (isDataStructLike dataRepr))
     --   -> return ()
-    _  -> do emitToH $ ppVis (conInfoVis con) <.>  text "struct" <+> ppName ((conInfoName con)) <+>
-                       block (let fields = (typeField ++ map ppConField conFields)
+    _  -> do 
+             case (dataInfoSec info) of
+              Just a -> emitToH $ ppVis (conInfoVis con) <.>  text "struct" <+> ppName ((conInfoName con)) <+>
+                        block (let fields = (typeField ++ map ppConField conFields)
+                              in if (null fields) then text "kk_box_t _unused;"  -- avoid empty struct
+                                                  else vcat fields) <+> text " __attribute__((section(" <+> text (show (a)) <+> text "), used))" <.> semi -- <-> text "kk_struct_packed_end"
+              Nothing -> emitToH $ ppVis (conInfoVis con) <.>  text "struct" <+> ppName ((conInfoName con)) <+>
+                         block (let fields = (typeField ++ map ppConField conFields)
                               in if (null fields) then text "kk_box_t _unused;"  -- avoid empty struct
                                                   else vcat fields) <.> semi -- <-> text "kk_struct_packed_end"
   where

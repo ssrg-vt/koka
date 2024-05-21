@@ -3,7 +3,7 @@ module averageScore
 import std/core/list
 import std/num/float64
 
-struct sec "foo" student 
+pub struct sec "foo" student 
   name : string
   score : int 
 
