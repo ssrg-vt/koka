@@ -47,6 +47,6 @@
 
 - Remove all automatically generated functions 
 - Remove all functions that are used for drop/box/unbox etc. 
-- Remove "static inline" from function as it is not supported for BPF target
+- Remove "static inline" from main eBPF function with section attributes as it is not supported for BPF target
 - Enum type generates ```char``` if the number of fields are less than 256. But as lot of eBPF programs returns enum type, it needs to be int. I changed the compiler to fix this. 
 - Section attributes are needed for functions and structures. This is also done.
