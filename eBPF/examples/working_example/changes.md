@@ -47,3 +47,4 @@
 
 - Remove all automatically generated functions 
 - Remove all functions that are used for drop/box/unbox etc. 
+- Remove "static inline" from function as it is not supported for BPF target
