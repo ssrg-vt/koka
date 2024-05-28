@@ -3,11 +3,11 @@ module averageScore
 import std/core/list
 import std/num/float64
 
-pub struct sec "foo" student 
+pub struct /*sec "foo"*/ student 
   name : string
   score : int 
 
-pub type sec "foo" foo
+/*pub type sec "foo" foo*/
 
 fun get_name (s : ref<h,student>) : <read<h>> int {
   val r1 = !s
