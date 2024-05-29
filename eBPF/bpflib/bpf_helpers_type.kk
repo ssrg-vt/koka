@@ -1,3 +1,4 @@
+/*
 module eBPF/bpflib/bpf_helpers_type
 
 import std/os/path
@@ -9,6 +10,7 @@ import std/core/int
 import std/num/int32
 
 // https://elixir.bootlin.com/linux/latest/source/kernel/bpf/helpers.c
+
 
 effect gpl_only {}
 
@@ -29,4 +31,4 @@ pub fun get_arg1_foo (f : foo_proto = Foo_proto(20.int32,50.int32)) : int32
 
 pub fun main()
   var r := get_arg1_foo()
-  println("The foo arg1 is " ++ r.show)
+  println("The foo arg1 is " ++ r.show) */
