@@ -1,4 +1,4 @@
-module eBPF/bpflib/ebpf_map
+module eBPF/bpflib/bpf_map
 
 import std/core/int
 

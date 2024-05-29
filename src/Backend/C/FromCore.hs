@@ -118,7 +118,13 @@ genModule separateMain ctarget buildType sourceDir penv platform newtypes borrow
                          , text "#ifndef " <.> modName <.> text "_H"
                          , text "#define " <.> modName <.> text "_H"
                          , headComment
-                         , text "#include <kklib.h>" ]
+                         , text "#include <linux/types.h>"
+                         , text "#include <asm/types.h>"
+                         , text "#include <kklib.h>"
+                         , text "#include <bpf/bpf_helpers.h>"
+                         , text "#include <linux/bpf.h>"
+                         , text "#include <inttypes.h>"
+                         , text "#include <stdint.h>" ]
                          ++ map moduleImport (coreProgImports core)
                          ++ externalIncludesH
 
