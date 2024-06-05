@@ -26,7 +26,7 @@ kk_std_core_types__maybe kk_array_get(kk_array* arr, ssize_t i, kk_context_t* ct
 }
 
 kk_std_core_types__maybe kk_array_set(kk_array* arr, ssize_t i, uint32_t x, kk_context_t* ctx) {
-  if (i >= 1024) {
+  if (i >= 512) {
     return kk_std_core_types__new_Nothing(ctx);
   }
   arr->data[i] = x;

@@ -11,6 +11,7 @@ import std/core/console
 extern import
   c file "inline/array"
 
+/* The pointer to array is private and datatype is exposed */
 struct array<s::S> { internal: intptr_t }
 
 extern unsafe-with-array(f: (intptr_t) -> <div,ndet,console> a): <div,ndet,console> a
