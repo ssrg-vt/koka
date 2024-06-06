@@ -10,8 +10,8 @@ pub sec "tp/syscalls/sys_enter_write" fun handle_tp() {
   if pid != my_pid then
    return 0 
   else 
-    println("hello from pid_gid")
-    return 0
+    //println("hello from pid_gid")
+    return pid.int
 }
 
 pub fun main() {
