@@ -7,9 +7,9 @@
 #include <stdint.h>
 #include </home/swarnp/research/koka/eBPF/examples/pid_gid/working/ebpf_kklib.h>
 
-/*#include <kklib.h>
+/*#include <kklib.h>*/
 #include <bpf/bpf_helpers.h>
-#include <linux/bpf.h>
+/*#include <linux/bpf.h>
 #include <inttypes.h>
 #include "std_core_types.h"
 #include "std_core_hnd.h"
@@ -29,9 +29,9 @@
 #include "std_core_show.h"
 #include "std_core_debug.h"
 #include "std_core_delayed.h"
-#include "std_core.h"
+#include "std_core.h"*/
 #include "eBPF_bpflib_bpf__helpers.h"
-#include "std_num_int64.h"
+/*#include "std_num_int64.h"
 #include "std_core_console.h"*/
 
 // type declarations
