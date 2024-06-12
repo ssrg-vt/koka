@@ -4,7 +4,8 @@
 // Koka generated module: eBPF/bpflib/bpf_helpers, koka version: 3.1.0, platform: 64-bit
 #include <linux/types.h>
 #include <asm/types.h>
-#include </home/swarnp/research/koka/eBPF/examples/pid_gid/working/eBPF_kklib/integer.h>
+#include </home/swarnp/research/koka/eBPF/eBPF_kklib/integer.h>
+//#include </home/swarnp/research/koka/eBPF/examples/pid_gid/working/eBPF_kklib/integer.h>
 /*#include <kklib.h>*/
 #include <bpf/bpf_helpers.h>
 #include <linux/bpf.h>
