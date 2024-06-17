@@ -1,6 +1,17 @@
 module eBPF/bpflib/bpf_helpers
 
 import std/num/int64
+import std/num/int32
+
+/*
+extern import 
+  c file "../src/bpfprintk.c"
+
+pub extern int32/bpf_printk(a : int32) : io ()
+  c inline "kk_printf_int32(#1)"
+
+pub extern int64/bpf_printk(a : int64) : io() 
+  c inline "kk_printf_int64(#1)" */
 
 /* u64 bpf_get_current_uid_gid(void)
    Description : Get the current uid and gid.
@@ -15,3 +26,4 @@ pub extern bpf_get_current_uid_gid () : int64
      and created as such: current_task->tgid << 32 | current_task->pid. */
 pub extern bpf_get_current_pid_tgid () : int64
   c inline "bpf_get_current_pid_tgid()"
+

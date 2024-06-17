@@ -13,15 +13,6 @@
 #include</home/swarnp/research/koka/eBPF/eBPF_kklib/platform.h>
 //#include </home/swarnp/research/koka/eBPF/examples/pid_gid/working/eBPF_kklib/platform.h>
 
-/*--------------------------------------------------------------------------------------
-  Tags
---------------------------------------------------------------------------------------*/
-
-// Tags for heap blocks
-typedef enum kk_tag_e {
-    KK_TAG_BIGINT     // big integer (see `integer.c`)
-} kk_tag_t;
-
 typedef long kk_integer_t;
 
 /* Added a simplified kk_context_t definition by removing all fields and keeping just 2*/
