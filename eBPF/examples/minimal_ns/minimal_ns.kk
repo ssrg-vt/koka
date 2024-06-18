@@ -25,12 +25,28 @@ int handle_tp(void *ctx)
 } */
 
 import eBPF/bpflib/bpf_helpers
+import eBPF/bpflib/bpf
+import std/num/int32
 import std/num/int64
 import std/core/console
 
 // https://github.com/libbpf/libbpf-bootstrap/blob/master/examples/c/minimal_ns.bpf.c#L16
 
-val my_pid = 0
-val dev = 0.0
-val ino = 0.0
+val my_pid = 0.int32
+val dev = 0.int64
+val ino = 0.int64
 
+pub sec "tp/syscalls/sys_enter_write" fun handle_tp() {
+  val ns = Bpf_pidns_info(0.int32, 0.int32)
+  val n = bpf_get_ns_current_pid_tgid(dev, ino, ref(ns), sizeof(ns))
+  if (ns.pid) != my_pid then
+   return 0.int32 
+  else 
+    //bpf_printk(pid)
+   return ns.pid
+}
+
+/*
+pub fun main() {
+  handle_tp()
+}*/

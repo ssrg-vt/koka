@@ -31,6 +31,7 @@ pub extern bpf_get_current_pid_tgid () : int64
 pub extern bpf_get_ns_current_pid_tgid (dev : int64, ino : int64, nsdata : ref<h,bpf_pidns_info>, size : int32) : int64 
   c inline "bpf_get_ns_current_pid_tgid(#1, #2, #3, #4)"
 
-
+pub extern sizeof (n : a) : int32
+  c inline "sizeof(#1)"
 
 
