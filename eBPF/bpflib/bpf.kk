@@ -36,6 +36,10 @@ pub ref struct xdp_md
   rx_queue_index : int32  // rxq->queue_index  
   egress_ifindex : int32 // txq->dev->ifindex 
 
+pub ref struct bpf_pidns_info 
+  pid : int32
+  tgid : int32
+
 
 
 

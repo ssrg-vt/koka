@@ -2,6 +2,7 @@ module eBPF/bpflib/bpf_helpers
 
 import std/num/int64
 import std/num/int32
+import eBPF/bpflib/bpf
 
 /*
 extern import 
@@ -26,4 +27,10 @@ pub extern bpf_get_current_uid_gid () : int64
      and created as such: current_task->tgid << 32 | current_task->pid. */
 pub extern bpf_get_current_pid_tgid () : int64
   c inline "bpf_get_current_pid_tgid()"
+
+pub extern bpf_get_ns_current_pid_tgid (dev : int64, ino : int64, nsdata : ref<h,bpf_pidns_info>, size : int32) : int64 
+  c inline "bpf_get_ns_current_pid_tgid(#1, #2, #3, #4)"
+
+
+
 
