@@ -664,7 +664,7 @@ structDecl dvis =
              (trng,doc) <- dockeyword "struct"
              return (vis,dvis,ddef,rng,trng,doc))
       seca <- optionMaybe $ do
-                              specialId "sec"
+                              specialId "attribute"
                               value <- stringLit
                               return value
       tbind <- tbinderDef
@@ -731,7 +731,7 @@ constructor defvis foralls resTp
                                                      (c,(crng,doc)) <- docconid
                                                      return (v,(krng,doc),(c,crng))
        seca <- optionMaybe $ do
-                              specialId "sec"
+                              specialId "attribute"
                               value <- stringLit
                               return value
        exists    <- typeparams
