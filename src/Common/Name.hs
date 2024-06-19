@@ -49,7 +49,7 @@ module Common.Name
           , fromImplicitParamName
 
           , prepend, postpend
-          , asciiEncode, moduleNameToPath, pathToModuleName
+          , asciiEncode, attributeEncode, moduleNameToPath, pathToModuleName
           -- , canonicalSep, canonicalName, nonCanonicalName, canonicalSplit
 
           , prettyName, prettyCoreName
@@ -947,6 +947,24 @@ asciiEncode isModule name
           _   -> "_x" ++ showHex 2 (fromEnum c) ++ "_"
 
 
+attributeEncode :: Bool -> String -> String
+attributeEncode isModule name
+  = case name of
+      (c:cs)  | isAlphaNum c -> encodeAttrs name
+      -- '@':'c':'o':'n':' ':cs -> trace ("con name: " ++ name) $ "_con_" ++ encodeChars cs
+      -- '@':'t':'y':'p':'e':' ':cs -> "_type_" ++ encodeChars cs
+      _       -> encodeAttrs name
+  where
+    encodeAttrs s
+      = concat (zipWith3 encodeAttr (' ':s) s (tail (s ++ " ")))
+
+    encodeAttr :: Char -> Char -> Char -> String
+    encodeAttr pre c post | isAlphaNum c  = [c]
+    encodeAttr pre c post
+      = case c of
+          '\"' -> ""
+
+          _   -> "_x" ++ showHex 2 (fromEnum c) ++ "_"
 
 showHex :: Int -> Int -> String
 showHex len i | i < 0

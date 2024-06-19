@@ -3,7 +3,7 @@ module averageScore
 import std/core/list
 import std/num/float64
 
-pub struct /*sec "foo"*/ student 
+pub struct attribute "aligned" student 
   name : string
   score : int 
 

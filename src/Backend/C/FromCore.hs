@@ -580,7 +580,7 @@ genConstructorType info dataRepr (con,conRepr,conFields,scanCount) =
               Just a -> emitToH $ ppVis (conInfoVis con) <.>  text "struct" <+> ppName ((conInfoName con)) <+>
                         block (let fields = (typeField ++ map ppConField conFields)
                               in if (null fields) then text "kk_box_t _unused;"  -- avoid empty struct
-                                                  else vcat fields) <+> text " __attribute__((" <+> text ("packed") <+> text "))" <.> semi -- <-> text "kk_struct_packed_end"
+                                                  else vcat fields) <+> text " __attribute__((" <+> ppAttribute(a) <+> text "))" <.> semi -- <-> text "kk_struct_packed_end"
               Nothing -> emitToH $ ppVis (conInfoVis con) <.>  text "struct" <+> ppName ((conInfoName con)) <+>
                          block (let fields = (typeField ++ map ppConField conFields)
                               in if (null fields) then text "kk_box_t _unused;"  -- avoid empty struct
@@ -2602,6 +2602,10 @@ ppName name
   = if isQualified name
      then ppModName (qualifier name) <.> text "_" <.> text (asciiEncode False (show (unqualify name)))-- encode False (unqualify name)
      else encode False name
+
+ppAttribute :: String -> Doc
+ppAttribute s
+  = text (attributeEncode False (show s))
 
 ppQName :: Name -> Name -> Doc
 ppQName modName name
