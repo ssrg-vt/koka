@@ -580,7 +580,7 @@ genConstructorType info dataRepr (con,conRepr,conFields,scanCount) =
               Just a -> emitToH $ ppVis (conInfoVis con) <.>  text "struct" <+> ppName ((conInfoName con)) <+>
                         block (let fields = (typeField ++ map ppConField conFields)
                               in if (null fields) then text "kk_box_t _unused;"  -- avoid empty struct
-                                                  else vcat fields) <+> text " __attribute__((section(" <+> text (show (a)) <+> text "), used))" <.> semi -- <-> text "kk_struct_packed_end"
+                                                  else vcat fields) <+> text " __attribute__((" <+> text ("packed") <+> text "))" <.> semi -- <-> text "kk_struct_packed_end"
               Nothing -> emitToH $ ppVis (conInfoVis con) <.>  text "struct" <+> ppName ((conInfoName con)) <+>
                          block (let fields = (typeField ++ map ppConField conFields)
                               in if (null fields) then text "kk_box_t _unused;"  -- avoid empty struct
