@@ -35,6 +35,8 @@ char __license[] SEC("license") = "GPL"; */
 
 import eBPF/bpflib/bpf_helpers
 import eBPF/bpflib/bpf
+import eBPF/bpflib/if_ethr
+import eBPF/bpflib/ip
 import std/num/int32
 import std/num/int64
 import std/core/console
@@ -45,6 +47,17 @@ val eth_p_ip =  0x0800 /* Internet Protocol packet	*/
 pub sec "tc" fun tc_ingress (skctx : sk_buff) {
   val data_end = (skctx.data_end).int64 
   val data = (skctx.data).int64 
-  
-  return 0
+  val protocol = (skctx.protocol)
+  val p = bpf_htons(eBPF/bpflib/if_ethr/eth_p_ip.int32)
+  if (protocol != p)
+   then return tc_act_ok
+  val l2 = data
+  val ul2 = (l2 + 1.int64)
+  if (ul2 > data_end)
+   then return tc_act_ok
+  val l3 = (l2 + 1.int64)
+  if (l3 > data_end)
+   then return tc_act_ok
+  //bpf_printk("Got IP packet: tot_len: %d, ttl: %d", bpf_ntohs(l3->tot_len), l3->ttl);
+  return tc_act_ok
 }

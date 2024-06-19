@@ -95,3 +95,13 @@ pub val eth_p_dsa_A5PSW = 0xE001      // /* A5PSW Tag Value [ NOT AN OFFICIALLY 
 pub val eth_p_ife = 0xED3E            // /* ForCES inter-FE LFB type */
 pub val eth_p_af_iucv =  0xFBFB       // /* IBM af_iucv [ NOT AN OFFICIALLY REGISTERED ID ] */
 pub val eth_p_802_3_min = 0x0600      // /* If the value in the ethernet type is more than this value then the frame is Ethernet II. Else it is 802.3 */
+
+pub struct attribute "packed" ethhdr 
+  //h_dest : array of char of size eth_alen (* add later *)
+  //h_source : array of char of size eth_alen (* add later *)
+  h_proto : int32    /* packet type ID field: it should be 16 bit, so we use shr operator to get the value */
+
+pub fun main() {
+  val l = Ethhdr(0.int32)
+  return 0
+}
