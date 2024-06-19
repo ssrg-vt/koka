@@ -42,7 +42,7 @@ pub sec "tp/syscalls/sys_enter_write" fun handle_tp() {
   if (ns.pid) != my_pid then
    return 0.int32 
   else 
-    //bpf_printk(pid)
+    //bpf_printk(ns.pid)
    return ns.pid
 }
 

@@ -40,6 +40,48 @@ pub ref struct bpf_pidns_info
   pid : int32
   tgid : int32
 
+/* user accessible mirror of in-kernel sk_buff.
+ * new fields can only be added to the end of this structure
+ */
+pub ref struct sk_buff //__sk_buff
+  len : int32
+  pkt_type : int32
+  mark : int32
+  queue_mapping : int32
+  protocol : int32
+  vlan_present : int32 
+  vlan_tci : int32
+  vlan_proto : int32
+  priority : int32
+  ingress_ifindex : int32 
+  ifindex : int32
+  tc_index : int32
+  //cb : array of int of size 5 (* add later: __u32 cb[5] *)
+  hash : int32
+  tc_classid : int32
+  data : int32
+  data_end : int32
+  napi_id : int32
+  /* Accessed by BPF_PROG_TYPE_sk_skb types from here to ... */
+  family : int32
+  /* stored in network byte order */
+  remote_ip4 : int32
+  local_ip4 : int32
+  //remote_ip6 : array of size 4 of type int (* add later: __u32 remote_ip6[4] *)
+  //local_ip6 : array of size 4 of type int (* add later: __u32 local_ip6[4] *)
+  /* stored in host byte order */
+  local_port : int32
+  data_meta : int32
+  //__bpf_md_ptr(struct bpf_flow_keys *, flow_keys); (* add later *)
+  tstamp : int64 
+  wire_len : int32
+  gso_segs : int32
+  //__bpf_md_ptr(struct bpf_sock *, sk);(* add later *)
+  gso_size : int32 
+  tstamp_type : int32 // use int8 instead 
+  // 	__u32 :24;		/* Padding, future use. */ (* add later *)
+  hwtstamp : int64
+
 
 
 
