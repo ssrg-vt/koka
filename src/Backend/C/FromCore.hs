@@ -266,7 +266,7 @@ genLocalGroup (DefNonRec def)
 
 
 genLocalDef :: Def -> Asm Doc
-genLocalDef def@(Def name tp expr vis seca sort inl rng comm)
+genLocalDef def@(Def name tp expr vis seca attr sort inl rng comm)
   = do penv <- getPrettyEnv
        let resDoc = typeComment (Pretty.ppType penv tp)
        defDoc <- genStat (ResultAssign (defTName def) Nothing) expr
@@ -312,7 +312,7 @@ genTopGroup group
                             genTopDef True inlineC def
 
 genFunTopDefSig :: Def -> Asm ()
-genFunTopDefSig def@(Def name tp defExpr vis seca sort inl rng comm)
+genFunTopDefSig def@(Def name tp defExpr vis seca attr sort inl rng comm)
   = do penv <- getPrettyEnv
        let tpDoc = typeComment (Pretty.ppType penv tp)
            sig   = (genFunDefSig False def)
@@ -321,45 +321,49 @@ genFunTopDefSig def@(Def name tp defExpr vis seca sort inl rng comm)
 
 -- adding a new attribute to function declaration to represent ebpf sec 
 genFunDefSig :: Bool -> Def -> Doc
-genFunDefSig inlineC def@(Def name tp defExpr vis seca sort inl rng comm)
-  = genFunSig inlineC vis seca name defExpr
+genFunDefSig inlineC def@(Def name tp defExpr vis seca attr sort inl rng comm)
+  = genFunSig inlineC vis seca attr name defExpr
 
 -- adding a new attribute to function signature to represent ebpf sec
-genFunSig :: Bool -> Visibility -> (Maybe String) -> Name -> Expr -> Doc
-genFunSig inlineC vis seca name defExpr
+genFunSig :: Bool -> Visibility -> (Maybe String) -> (Maybe String) -> Name -> Expr -> Doc
+genFunSig inlineC vis seca attr name defExpr
   = let tryFun expr = case expr of
                         TypeApp e _   -> tryFun e
                         TypeLam _ e   -> tryFun e
-                        Lam params eff body  -> genLamSig seca inlineC vis name params body
+                        Lam params eff body  -> genLamSig seca attr inlineC vis name params body
                         _             -> error ("Backend.C.FromCore.genFunDefSig: not a function: " ++ show (name,defExpr))
     in tryFun defExpr
 
 -- adding a new attribute to lambda signature to represent ebpf sec
-genLamSig :: (Maybe String) -> Bool -> Visibility -> Name -> [TName] -> Expr -> Doc
-genLamSig seca inlineC vis name params body
-  = (case seca of 
-      Just a -> (if (inlineC) 
-                     then text (" __attribute__((section(" ++ show (a) ++ "), used)) static inline ")
-                       -- else if (not (isPublic vis)) then text "static "
-                     else text (" __attribute__((section(" ++ show (a) ++ "), used)) ")) 
-      Nothing -> (if (inlineC) 
-                     then text " static inline "
-                       -- else if (not (isPublic vis)) then text "static "
-                     else empty))  <.>
+genLamSig :: (Maybe String) -> (Maybe String) -> Bool -> Visibility -> Name -> [TName] -> Expr -> Doc
+genLamSig seca attr inlineC vis name params body
+  = (case (seca, attr) of 
+      (Just a, Just b) -> (if (inlineC) 
+                           then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text (" __attribute((") <+> ppAttribute(b) <+> text "))" <+> text (" static inline ")
+                           -- else if (not (isPublic vis)) then text "static "
+                           else text (" __attribute__((section(" ++ show (a) ++ "), used)) ") <+> text (" __attribute((") <+> ppAttribute(b) <+> text ")) ") 
+      (Nothing, Just b) -> (if (inlineC) 
+                            then text (" __attribute((") <+> ppAttribute(b) <+> text ")) " <+> text " static inline "
+                           -- else if (not (isPublic vis)) then text "static "
+                            else text (" __attribute((") <+> ppAttribute(b) <+> text ")) ")
+      (Nothing, Nothing) -> (if (inlineC) 
+                             then text " static inline "
+                             -- else if (not (isPublic vis)) then text "static "
+                             else empty)) <.>
     ppType (typeOf body) <+> ppName name <.> tparameters params
 
 -- adding a new attribute to top def to represent ebpf sec and no decision is based on sec  
 genTopDef :: Bool -> Bool -> Def -> Asm ()
-genTopDef genSig inlineC def@(Def name tp expr vis seca sort inl rng comm)
+genTopDef genSig inlineC def@(Def name tp expr vis seca attr sort inl rng comm)
   = do when (not (null comm)) $
          (if inlineC then emitToH else emitToC) (align (vcat (space : map text (lines (trimComment comm))))) {- already a valid C comment -}
        genTopDefDecl genSig inlineC def
 
 -- adding a new attribute to top def decl to represent ebpf sec 
 genTopDefDecl :: Bool -> Bool -> Def -> Asm ()
-genTopDefDecl genSig inlineC def@(Def name tp defBody vis seca sort inl rng comm) | isValueOperation tp
+genTopDefDecl genSig inlineC def@(Def name tp defBody vis seca attr sort inl rng comm) | isValueOperation tp
   = return () -- don't generate code for phantom definitions for value operations (these were only needed for type checking)
-genTopDefDecl genSig inlineC def@(Def name tp defBody vis seca sort inl rng comm)
+genTopDefDecl genSig inlineC def@(Def name tp defBody vis seca attr sort inl rng comm)
   = let tryFun expr = case expr of
                         TypeApp e _   -> tryFun e
                         TypeLam _ e   -> tryFun e
@@ -410,7 +414,7 @@ genTopDefDecl genSig inlineC def@(Def name tp defBody vis seca sort inl rng comm
                       genStat (ResultReturn (Just (TName name resTp)) params) body
            penv <- getPrettyEnv
            let tpDoc = typeComment (Pretty.ppType penv tp)
-           let sig = genLamSig seca inlineC vis name params body
+           let sig = genLamSig seca attr inlineC vis name params body
            when (genSig && not inlineC {-&& isPublic (defVis def)-}) $ emitToH (linebreak <.> sig <.> semi <+> tpDoc)
            top <- getTop -- get top level decls generated by body (for functions etc)
            emit $ linebreak
@@ -1474,7 +1478,7 @@ genExprStat result expr
 
       Let groups body
         -> case (reverse groups, body) of
-             (DefNonRec (Def name tp expr Private _ DefVal _ _ _):rgroups, (Case [Var vname _] branches))
+             (DefNonRec (Def name tp expr Private _ _ DefVal _ _ _):rgroups, (Case [Var vname _] branches))
                | name == getName vname && not (S.member vname (freeLocals branches)) && isInlineableExpr expr
                -> genExprStat result (makeLet (reverse rgroups) (Case [expr] branches))
              _ -> do docs1 <- genLocalGroups groups

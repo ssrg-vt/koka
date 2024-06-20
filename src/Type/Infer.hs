@@ -205,7 +205,7 @@ inferDefGroup topLevel (DefRec defs) cont
     createGammas :: [(Name,NameInfo)] -> [(Name,NameInfo)] -> [Def Type] -> Inf ([(Name,NameInfo)],[(Name,NameInfo)])
     createGammas gamma infgamma []
       = return (reverse gamma, reverse infgamma)
-    createGammas gamma infgamma (Def (ValueBinder name () expr nameRng vrng) rng vis sort inl doc seca: defs)
+    createGammas gamma infgamma (Def (ValueBinder name () expr nameRng vrng) rng vis sort inl doc seca attr: defs)
       = case (lookup name infgamma) of
           (Just _)
             -> do env <- getPrettyEnv
@@ -398,7 +398,7 @@ inferRecDef2 topLevel coreDef divergent (def,mbAssumed)
 
         -- coref2      <- checkEmptyPredicates rng
         -- resTp2      <- subst resTp1
-        coreDef2    <- subst (Core.Def (Core.defName coreDef) resTp2 coreExpr (Core.defVis coreDef) Nothing csort (Core.defInline coreDef) (Core.defNameRange coreDef) (Core.defDoc coreDef))
+        coreDef2    <- subst (Core.Def (Core.defName coreDef) resTp2 coreExpr (Core.defVis coreDef) Nothing Nothing csort (Core.defInline coreDef) (Core.defNameRange coreDef) (Core.defDoc coreDef))
         return (coreDef2)
 
 inferRecDef :: Bool -> [(Name,NameInfo)] -> Def Type -> Inf Core.Def
@@ -443,7 +443,7 @@ inferRecDef topLevel infgamma def
 
                   coref2      <- checkEmptyPredicates rng
                   resTp2      <- subst resTp1
-                  coreDef2    <- subst (Core.Def (Core.defName coreDef) resTp2 (coref2 coreExpr) (Core.defVis coreDef) Nothing (Core.defSort coreDef) (Core.defInline coreDef) (Core.defNameRange coreDef) (Core.defDoc coreDef))
+                  coreDef2    <- subst (Core.Def (Core.defName coreDef) resTp2 (coref2 coreExpr) (Core.defVis coreDef) Nothing Nothing (Core.defSort coreDef) (Core.defInline coreDef) (Core.defNameRange coreDef) (Core.defDoc coreDef))
 
                   if (False && not topLevel && not (CoreVar.isTopLevel coreDef2) && not (isRho (Core.typeOf coreDef2)))
                    then do -- trace ("local rec with free vars: " ++ show coreDef2) $ return ()
@@ -455,7 +455,7 @@ inferRecDef topLevel infgamma def
 
 
 inferDef :: Expect -> Def Type -> Inf Core.Def
-inferDef expect (Def (ValueBinder name mbTp expr nameRng vrng) rng vis sort inl doc seca)
+inferDef expect (Def (ValueBinder name mbTp expr nameRng vrng) rng vis sort inl doc seca attr)
  =do penv <- getPrettyEnv
      if (verbose penv >= 4)
       then Lib.Trace.trace ("infer: " ++ show sort ++ " " ++ show name) $ return ()
@@ -481,28 +481,28 @@ inferDef expect (Def (ValueBinder name mbTp expr nameRng vrng) rng vis sort inl 
                     in addRangeInfo (endOfRange vrng {-')'-}) (RM.Id (newName "result") (RM.NIValue "expr" tp "" False) [] True)
                _ -> return ()
 
-           subst (Core.Def name resTp resCore vis seca sort inl nameRng doc)  -- must 'subst' since the total unification can cause substitution. (see test/type/hr1a)
+           subst (Core.Def name resTp resCore vis seca attr sort inl nameRng doc)  -- must 'subst' since the total unification can cause substitution. (see test/type/hr1a)
 
 isAnnotatedBinder :: ValueBinder (Maybe Type) x -> Bool
 isAnnotatedBinder (ValueBinder _ Just{} _ _ _) = True
 isAnnotatedBinder _                                 = False
 
 inferBindDef :: Def Type -> Inf (Effect,Core.Def)
-inferBindDef def@(Def (ValueBinder name () expr nameRng vrng) rng vis sort inl doc seca)
+inferBindDef def@(Def (ValueBinder name () expr nameRng vrng) rng vis sort inl doc seca attr)
   = -- trace ("infer bind def: " ++ show name ++ ", var?:" ++ show (sort==DefVar)) $
     do withDefName name $ disallowHole $
         do (tp,eff,coreExpr) <- inferExpr Nothing Instantiated expr
            stp <- subst tp
                                 --  Just annTp -> inferExpr (Just (annTp,rng)) Instantiated (Ann expr annTp rng)
            coreDef <- if (sort /= DefVar)
-                       then return (Core.Def name tp coreExpr vis seca sort inl nameRng doc)
+                       then return (Core.Def name tp coreExpr vis seca attr sort inl nameRng doc)
                        else do hp <- Op.freshTVar kindHeap Meta
                                (qrefName,_,info) <- resolveName nameRef Nothing rng
                                let refTp  = typeApp typeRef [hp,tp]
                                    refVar = coreExprFromNameInfo qrefName info
                                    refExpr = Core.App (Core.TypeApp refVar [hp,stp]) [coreExpr] -- TODO: fragile: depends on order of quantifiers of the ref function!
                                -- traceDoc $ \penv -> text "reference" <+> pretty name <.> colon <+> ppType penv stp
-                               return (Core.Def name refTp refExpr vis seca sort inl nameRng doc)
+                               return (Core.Def name refTp refExpr vis seca attr sort inl nameRng doc)
 
            if (not (isWildcard name))
             then let sort = (if defIsVal def then "val" else "fun")
@@ -1433,12 +1433,12 @@ inferApp propagated expect fun nargs rng
                                 vars <- mapM (\_ -> uniqueName "arg") iargs
                                 let vargs = zip vars [(i,carg) | (carg,(i,_)) <- zip coreArgs iargs]
                                     eargs = sortBy (\(_,(i,_)) (_,(j,_)) -> compare i j) vargs
-                                    defs  = [Core.DefNonRec (Core.Def var (Core.typeOf arg) arg Core.Private Nothing DefVal InlineAuto rangeNull "") | (var,(_,arg)) <- eargs]
+                                    defs  = [Core.DefNonRec (Core.Def var (Core.typeOf arg) arg Core.Private Nothing Nothing DefVal InlineAuto rangeNull "") | (var,(_,arg)) <- eargs]
                                     cargs = [Core.Var (Core.TName var (Core.typeOf arg)) Core.InfoNone | (var,(_,arg)) <- vargs]
                                 if (Core.isTotal fcore)
                                 then return (Core.makeLet defs (coreApp fcore cargs))
                                 else do fname <- uniqueName "fct"
-                                        let fdef = Core.DefNonRec (Core.Def fname ftp fcore Core.Private Nothing (defFun [] {-all own, TODO: maintain borrow annotations?-}) InlineAuto rangeNull "")
+                                        let fdef = Core.DefNonRec (Core.Def fname ftp fcore Core.Private Nothing Nothing (defFun [] {-all own, TODO: maintain borrow annotations?-}) InlineAuto rangeNull "")
                                             fvar = Core.Var (Core.TName fname ftp) Core.InfoNone
                                         return (Core.Let (fdef:defs) (coreApp fvar cargs))
            -- take top effect
@@ -1915,7 +1915,7 @@ inferOptionals eff infgamma (par:pars)
                                       ]
                                       [ Core.Guard   Core.exprTrue coreExpr ]
                        ]
-                def  = Core.Def local partp init Private Nothing DefVal InlineNever (binderNameRange par) ""
+                def  = Core.Def local partp init Private Nothing Nothing DefVal InlineNever (binderNameRange par) ""
                 sub  = [(Core.TName (binderName par) tp, Core.Var (Core.TName local partp) Core.InfoNone)]
                 -- coref core
                 --   = Core.Let [Core.DefNonRec def] ((CoreVar.|~>) sub core)

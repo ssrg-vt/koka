@@ -193,7 +193,7 @@ synCopyCon modName info con
         params = [ValueBinder name Nothing (if not (hasAccessor name t con) then Nothing else (Just (app (var name) [var argName]))) rc rc| (name,t) <- conInfoParams con]
         expr = Lam ([ValueBinder argName Nothing Nothing rc rc] ++ params) body rc
         body = app (var (conInfoName con)) [var name | (name,tp) <- conInfoParams con]
-        def  = DefNonRec (Def (ValueBinder defName () (Ann expr fullTp rc) rc rc) rc (dataInfoVis info) (defFun []) InlineAuto "" Nothing)
+        def  = DefNonRec (Def (ValueBinder defName () (Ann expr fullTp rc) rc rc) rc (dataInfoVis info) (defFun []) InlineAuto "" Nothing Nothing)
     in def
 
 hasAccessor :: Name -> Type -> ConInfo -> Bool
@@ -256,7 +256,7 @@ synAccessors modName info
                 messages
                   = [Lit (LitString (sourceName (posSource (rangeStart rng)) ++ show rng) rng), Lit (LitString (show name) rng)]
                 doc = "// Automatically generated. Retrieves the `" ++ show name ++ "` constructor field of the `:" ++ nameLocal (dataInfoName info) ++ "` type.\n"
-            in DefNonRec (Def (ValueBinder defName () expr xrng xrng) rng visibility (defFunEx [Borrow] noFip) InlineAlways doc Nothing)
+            in DefNonRec (Def (ValueBinder defName () expr xrng xrng) rng visibility (defFunEx [Borrow] noFip) InlineAlways doc Nothing Nothing)
 
     in map synAccessor fields
 
@@ -274,14 +274,14 @@ synTester info con
         branch2   = Branch (PatWild rc) [Guard guardTrue (Var nameFalse False rc)]
         patterns  = [(Nothing,PatWild rc) | _ <- conInfoParams con]
         doc = "// Automatically generated. Tests for the `" ++ nameLocal (conInfoName con) ++ "` constructor of the `:" ++ nameLocal (dataInfoName info) ++ "` type.\n"
-    in [DefNonRec (Def (ValueBinder name () expr rc rc) rc (conInfoVis con) (defFunEx [Borrow] (Fip (AllocAtMost 0))) InlineAlways doc Nothing)]
+    in [DefNonRec (Def (ValueBinder name () expr rc rc) rc (conInfoVis con) (defFunEx [Borrow] (Fip (AllocAtMost 0))) InlineAlways doc Nothing Nothing)]
 
 synConstrTag :: (ConInfo) -> DefGroup Type
 synConstrTag (con)
   = let name = toOpenTagName (unqualify (conInfoName con))
         rc   = rangeHide (conInfoRange con)
         expr = Lit (LitString (show (conInfoName con)) rc)
-    in DefNonRec (Def (ValueBinder name () expr rc rc) rc (conInfoVis con) DefVal InlineNever "" Nothing)
+    in DefNonRec (Def (ValueBinder name () expr rc rc) rc (conInfoVis con) DefVal InlineNever "" Nothing Nothing)
 
 {---------------------------------------------------------------
   Types for constructors
@@ -523,9 +523,9 @@ infDefGroup (DefNonRec def)
        return (DefNonRec def')
 
 infDef :: (Def UserType) -> KInfer (Def Type)
-infDef (Def binder rng vis isVal inl doc seca)
+infDef (Def binder rng vis isVal inl doc seca attr)
   = do binder' <- infValueBinder binder
-       return (Def binder' rng vis isVal inl doc seca)
+       return (Def binder' rng vis isVal inl doc seca attr)
 
 infValueBinder (ValueBinder name () expr nameRng rng)
   = do expr'   <- infExpr expr

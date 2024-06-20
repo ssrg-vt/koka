@@ -205,11 +205,11 @@ makeList tp exprs
 
 makeDef :: Name -> Expr -> Def
 makeDef name expr
-  = Def name (typeOf expr) expr Private Nothing DefVal InlineNever rangeNull ""
+  = Def name (typeOf expr) expr Private Nothing Nothing DefVal InlineNever rangeNull ""
 
 makeTDef :: TName -> Expr -> Def
 makeTDef (TName name tp) expr
-  = Def name tp expr Private Nothing DefVal InlineNever rangeNull ""
+  = Def name tp expr Private Nothing Nothing DefVal InlineNever rangeNull ""
 
 
 makeDefExpr :: Expr -> Def
@@ -595,6 +595,7 @@ data Def = Def{ defName  :: !Name
               , defExpr  :: !Expr
               , defVis   :: !Visibility     -- Private, Public
               , defSec :: !(Maybe String)
+              , defAttribute :: !(Maybe String) 
               , defSort  :: !DefSort        -- DefFun, DefVal, DefVar
               , defInline:: !DefInline      -- InlineAuto, InlineAlways, InlineNever
               , defNameRange :: !Range
@@ -1129,7 +1130,7 @@ addLambdasTName pars eff e            = Lam pars eff e
 -- | Bind a variable inside a term
 addNonRec :: Name -> Type -> Expr -> (Expr -> Expr)
 addNonRec x tp e e'
-  = Let [DefNonRec (Def x tp e Private Nothing (if isValueExpr e then DefVal else defFun [] {-all owned?-}) InlineAuto rangeNull "")] e'
+  = Let [DefNonRec (Def x tp e Private Nothing Nothing (if isValueExpr e then DefVal else defFun [] {-all owned?-}) InlineAuto rangeNull "")] e'
 
 -- | Is an expression a value or a function
 isValueExpr :: Expr -> Bool

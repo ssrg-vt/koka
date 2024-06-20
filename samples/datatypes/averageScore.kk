@@ -3,13 +3,13 @@ module averageScore
 import std/core/list
 import std/num/float64
 
-pub struct /*attribute "aligned"*/ student 
+pub struct /*tattribute "aligned"*/ student 
   name : string
   score : int 
 
-/*pub type sec "foo" foo*/
+//pub type attribute "foo" bar
 
-fun get_name (s : ref<h,student>) : <read<h>> int {
+pub /*sec "foo" fattribute "noinline"*/ fun get_name (s : ref<h,student>) : <read<h>> int {
   val r1 = !s
   val r2 = r1.score
   return r2

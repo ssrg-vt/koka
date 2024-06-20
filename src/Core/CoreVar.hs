@@ -56,7 +56,7 @@ extractDepsFromSignatures core
 --------------------------------------------------------------------------}
 
 isTopLevel :: Def -> Bool
-isTopLevel (Def name tp expr vis isVal inl nameRng doc seca)
+isTopLevel (Def name tp expr vis isVal inl nameRng doc seca attr)
   = let freeVar = filter (\(nm) -> not (isQualified nm) && nm /= unqualify name) (map getName (tnamesList (fv expr)))
         freeTVar = ftv expr
         yes = (null freeVar && tvsIsEmpty freeTVar)
@@ -100,8 +100,8 @@ instance HasExpVar DefGroup where
       DefNonRec def -> bv def
 
 instance HasExpVar Def where
-  fv (Def name tp expr vis Nothing isVal inl nameRng doc) = fv expr
-  bv (Def name tp expr vis Nothing isVal inl nameRng doc) = S.singleton (TName name tp)
+  fv (Def name tp expr vis Nothing Nothing isVal inl nameRng doc) = fv expr
+  bv (Def name tp expr vis Nothing Nothing isVal inl nameRng doc) = S.singleton (TName name tp)
 
 fvDefGroups :: (HasExpVar t, HasExpVar a) => [a] -> t -> S.Set TName
 fvDefGroups defGroups expr
@@ -165,10 +165,10 @@ instance HasExprVar DefGroup where
 
 
 instance HasExprVar Def where
-  sub |~> (Def dname scheme expr vis Nothing isVal inl nameRng doc)
+  sub |~> (Def dname scheme expr vis Nothing Nothing isVal inl nameRng doc)
     = -- assertion "Core.HasExprVar.Def.|~>" (TName name scheme `notIn` sub) $
       let sub' = [(name,e) | (name,e) <- sub, getName name /= dname]
-      in Def dname scheme (sub' |~> expr) vis Nothing isVal inl nameRng doc
+      in Def dname scheme (sub' |~> expr) vis Nothing Nothing isVal inl nameRng doc
 
 instance HasExprVar Expr where
   sub |~> expr =
