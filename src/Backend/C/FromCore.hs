@@ -340,11 +340,11 @@ genLamSig seca attr inlineC vis name params body
   = (case (seca, attr) of 
       (Just a, Just b) -> (if (inlineC) 
                            then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text (" __attribute((") <+> ppAttribute(b) <+> text "))" <+> text (" static inline ")
-                           -- else if (not (isPublic vis)) then text "static "
+                           else if (not (isPublic vis)) then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text (" __attribute((") <+> ppAttribute(b) <+> text "))" <+> text "static "
                            else text (" __attribute__((section(" ++ show (a) ++ "), used)) ") <+> text (" __attribute((") <+> ppAttribute(b) <+> text ")) ") 
       (Nothing, Just b) -> (if (inlineC) 
                             then text (" __attribute((") <+> ppAttribute(b) <+> text ")) " <+> text " static inline "
-                           -- else if (not (isPublic vis)) then text "static "
+                            else if (not (isPublic vis)) then text (" __attribute((") <+> ppAttribute(b) <+> text "))" <+> text "static "
                             else text (" __attribute((") <+> ppAttribute(b) <+> text ")) ")
       (Nothing, Nothing) -> (if (inlineC) 
                              then text " static inline "
