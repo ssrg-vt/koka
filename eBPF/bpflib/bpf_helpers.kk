@@ -4,7 +4,6 @@ import std/num/int64
 import std/num/int32
 import eBPF/bpflib/bpf
 
-/*
 extern import 
   c file "../src/bpfprintk.c"
 
@@ -12,7 +11,7 @@ pub extern int32/bpf_printk(a : int32) : io ()
   c inline "kk_printf_int32(#1)"
 
 pub extern int64/bpf_printk(a : int64) : io() 
-  c inline "kk_printf_int64(#1)" */
+  c inline "kk_printf_int64(#1)" 
 
 /* u64 bpf_get_current_uid_gid(void)
    Description : Get the current uid and gid.

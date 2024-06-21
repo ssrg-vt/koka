@@ -348,8 +348,12 @@ genLamSig seca attr inlineC vis name params body
                             else text (" __attribute((") <+> ppAttribute(b) <+> text ")) ")
       (Nothing, Nothing) -> (if (inlineC) 
                              then text " static inline "
-                             -- else if (not (isPublic vis)) then text "static "
-                             else empty)) <.>
+                             else if (not (isPublic vis)) then text "static "
+                             else empty)
+      (Just a, Nothing) -> (if (inlineC) 
+                            then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text (" static inline ")
+                            else if (not (isPublic vis)) then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text "static "
+                            else text (" __attribute__((section(" ++ show (a) ++ "), used)) "))) <.>
     ppType (typeOf body) <+> ppName name <.> tparameters params
 
 -- adding a new attribute to top def to represent ebpf sec and no decision is based on sec  
