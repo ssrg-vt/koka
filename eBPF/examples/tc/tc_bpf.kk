@@ -45,17 +45,17 @@ val tc_act_ok = 0
 val eth_p_ip =  0x0800 /* Internet Protocol packet	*/
 
 pub sec "tc" fun tc_ingress (skctx : sk_buff) {
-  val data_end = (skctx.data_end).int64 
-  val data = (skctx.data).int64 
+  val data_end = ref((skctx.data_end).int64) 
+  val data = ref((skctx.data).int64) 
   val protocol = (skctx.protocol)
   val p = bpf_htons(eBPF/bpflib/if_ethr/eth_p_ip.int32)
   if (protocol != p)
    then return tc_act_ok
   val l2 = data
-  val ul2 = (l2 + 1.int64)
+  val ul2 = (l2 + sizeof(data))
   if (ul2 > data_end)
    then return tc_act_ok
-  val l3 = (l2 + 1.int64)
+  val l3 = ref((l2 + sizeof(data)).iphdr)
   if (l3 > data_end)
    then return tc_act_ok
   //bpf_printk("Got IP packet: tot_len: %d, ttl: %d", bpf_ntohs(l3->tot_len), l3->ttl);
