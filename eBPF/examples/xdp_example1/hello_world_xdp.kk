@@ -4,6 +4,7 @@ import std/num/int32
 import std/core/string
 import std/core/console
 import eBPF/bpflib/bpf
+import eBPF/bpflib/bpf_helpers
 
 /* pub sec "xdp" fun hello_world_xdp(ictx : ref<h,xdp_md>) : <read<h>> int32 {
    val xc = !ictx
@@ -12,7 +13,8 @@ import eBPF/bpflib/bpf
    //return XDP_PASS
 } */
 
-pub sec "xdp" fun xdp_prog_simpl(ictx : xdp_md) : xdp_action {
+pub sec "xdp" fun xdp_prog_simpl(ictx : xdp_md) {
+   bpf_printk(0.int32)
    return XDP_PASS
 }
 
@@ -21,6 +23,3 @@ pub sec "xdp" fun xdp_prog_simpl(ictx : xdp_md) : xdp_action {
    var r := xdp_prog_simpl(ictx)
    return r
 }*/
-
-
-
