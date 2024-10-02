@@ -339,20 +339,21 @@ genLamSig :: (Maybe String) -> (Maybe String) -> Bool -> Visibility -> Name -> [
 genLamSig seca attr inlineC vis name params body
   = (case (seca, attr) of 
       (Just a, Just b) -> (if (inlineC) 
-                           then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text (" __attribute((") <+> ppAttribute(b) <+> text "))" <+> text (" static inline ")
-                           else if (not (isPublic vis)) then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text (" __attribute((") <+> ppAttribute(b) <+> text "))" <+> text "static "
-                           else text (" __attribute__((section(" ++ show (a) ++ "), used)) ") <+> text (" __attribute((") <+> ppAttribute(b) <+> text ")) ") 
+                           then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text (" __attribute__((") <+> ppAttribute(b) <+> text "))" <+> text (" static inline ")
+                           else if (not (isPublic vis)) then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text (" __attribute__((") <+> ppAttribute(b) <+> text "))" <+> text " static "
+                           else text (" __attribute__((section(" ++ show (a) ++ "), used)) ") <+> text (" __attribute__((") <+> ppAttribute(b) <+> text ")) ") 
       (Nothing, Just b) -> (if (inlineC) 
-                            then text (" __attribute((") <+> ppAttribute(b) <+> text ")) " <+> text " static inline "
-                            else if (not (isPublic vis)) then text (" __attribute((") <+> ppAttribute(b) <+> text "))" <+> text "static "
-                            else text (" __attribute((") <+> ppAttribute(b) <+> text ")) ")
+                            then text (" __attribute__((") <+> ppAttribute(b) <+> text ")) " <+> text " static inline "
+                            else if (not (isPublic vis)) then text (" __attribute__((") <+> ppAttribute(b) <+> text "))" <+> text " static "
+                            else text (" __attribute__((") <+> ppAttribute(b) <+> text ")) ")
       (Nothing, Nothing) -> (if (inlineC) 
                              then text " static inline "
-                             else if (not (isPublic vis)) then text "static "
+                             -- FIXME: static should be fine when `not (isPublic vis)` but uncommenting leads to test failures
+                             -- else if (not (isPublic vis)) then text " static "
                              else empty)
       (Just a, Nothing) -> (if (inlineC) 
                             then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text (" static inline ")
-                            else if (not (isPublic vis)) then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text "static "
+                            else if (not (isPublic vis)) then text (" __attribute__((section(" ++ show (a) ++ "), used))") <+> text " static "
                             else text (" __attribute__((section(" ++ show (a) ++ "), used)) "))) <.>
     ppType (typeOf body) <+> ppName name <.> tparameters params
 
