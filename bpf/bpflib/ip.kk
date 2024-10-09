@@ -1,8 +1,5 @@
 module bpf/bpflib/ip
 
-import std/num/int32
-import std/num/int64 
-
 // https://github.com/torvalds/linux/blob/master/include/uapi/linux/ip.h
 
 pub struct struct_group 

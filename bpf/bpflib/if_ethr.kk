@@ -1,8 +1,5 @@
 module bpf/bpflib/if_ethr
 
-import std/num/int32
-import std/num/int64 
-
 // https://github.com/torvalds/linux/blob/master/include/uapi/linux/if_ether.h
 
 pub val eth_alen = 6                    // /* Octets in one ethernet addr	 */

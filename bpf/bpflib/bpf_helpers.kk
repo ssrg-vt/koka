@@ -1,11 +1,12 @@
-module bpf/bpflib/bpf_helper_defs
+module bpf/bpflib/bpf_helpers
 
+import bpf/bpflib/bpf
 import bpf/bpflib/bpf_map
-import std/num/int64
-import std/num/int32
 
 extern import
   c file "../src/bpfprintk.c"
+
+// TODO: Add a BeePL backend and inline option
 
 /*
  * bpf_get_current_uid_gid
@@ -92,7 +93,7 @@ pub extern bpf_map_lookup_elem (m : bpf_map<a,b>, k : ref<h,a>) : ref<h,b>
  * static long (* const bpf_map_update_elem)(void *map, const void *key, const void *value, __u64 flags) = (void *) 2;
  */
 pub extern bpf_map_update_elem (m : bpf_map<a,b>, k : ref<h,a>, v : ref<h,b>, f : flag_map) : int 
-  c inline "bpf_map_update_elem"
+  c inline "bpf_map_update_elem(#1, #2, #3, #4)"
 
 /*
  * bpf_map_delete_elem
@@ -105,10 +106,10 @@ pub extern bpf_map_update_elem (m : bpf_map<a,b>, k : ref<h,a>, v : ref<h,b>, f 
  * static long (* const bpf_map_delete_elem)(void *map, const void *key) = (void *) 3;
  */
 pub extern bpf_map_delete_elem (m : bpf_map<a,b>, k : ref<h,a>) : int 
-  c inline "bpf_map_delete_elem"
+  c inline "bpf_map_delete_elem(#1, #2)"
 
 
-// NOT BPF HELPER FUNCTIONS BUT WILL BE USEFUL TO HAVE
+// NOT HELPER FUNCTIONS BUT WILL BE USEFUL TO HAVE
 
 pub extern int32/bpf_printk(a : int32) : io ()
   c inline "kk_printf_int32(#1)"
@@ -120,10 +121,9 @@ pub extern int64/bpf_printk(a : int64) : io ()
 pub extern bpf_htons (x : int32) : int32
   c inline "__builtin_bswap32(#1)"
 
-// 
+// NOTE: In Koka function names cannot start with an underscore
+pub extern sync_fetch_and_add(x : ref<int32>, i : int32)
+  c inline "__sync_fetch_and_add(#1, #2)"
+
 pub extern sizeof (n : a) : int32
   c inline "sizeof(#1)"
-
-pub fun main()
-  val s = "hello"
-  println(s)
