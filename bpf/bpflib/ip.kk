@@ -1,4 +1,4 @@
-module eBPF/bpflib/ip
+module bpf/bpflib/ip
 
 import std/num/int32
 import std/num/int64 
@@ -18,5 +18,3 @@ pub struct iphdr
   protocol : int32 // needs to be u8: use shr twice 
   check : int32 // needs to be u16 : use shr once 
   addrs : struct_group 
-
-

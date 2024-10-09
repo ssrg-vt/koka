@@ -1,4 +1,4 @@
-module eBPF/bpflib/if_ethr
+module bpf/bpflib/if_ethr
 
 import std/num/int32
 import std/num/int64 
