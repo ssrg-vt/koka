@@ -26,15 +26,10 @@ pub sec "xdp" fun packet_count(ctx : xdp_md) {
   return XDP_PASS
 }
 
-// By convention the license variable is typically `LICENSE` but in koka 
-// variable names cannot start with capital letters. Thankfully bpftool does not
-// care what the variable name is so long as there is a valid string 
-// (e.g., "Dual BSD/GPL") in the license section of the ELF file
 val license sec "license" = "Dual BSD/GPL"
 
 // Alternative syntax ideas. Many variations exist
-/*
-val license sec("license")  = "Dual BSD/GPL" <- closest to C
-val license @sec("license") = "Dual BSD/GPL"
-val sec("license") license  = "Dual BSD/GPL"
-*/
+//
+// val license @sec("license") = "Dual BSD/GPL"
+// val @sec("license") license  = "Dual BSD/GPL"
+// @license("Dual BSD/GPL")
