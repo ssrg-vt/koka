@@ -67,7 +67,7 @@ pub extern bpf_get_ns_current_pid_tgid (dev : int64, ino : int64, nsdata : ref<h
  *
  * static void *(* const bpf_map_lookup_elem)(void *map, const void *key) = (void *) 1;
  */
-pub extern bpf_map_lookup_elem (m : bpf_map<a,b>, k : ref<h,a>) : ref<h,b>
+pub extern bpf_map_lookup_elem (m : bpf_map<a,b>, k : ref<h,a>) : maybe<ref<h,b>>
   c inline "bpf_map_lookup_elem(#1, #2)"
 
 /*
@@ -92,7 +92,7 @@ pub extern bpf_map_lookup_elem (m : bpf_map<a,b>, k : ref<h,a>) : ref<h,b>
  *
  * static long (* const bpf_map_update_elem)(void *map, const void *key, const void *value, __u64 flags) = (void *) 2;
  */
-pub extern bpf_map_update_elem (m : bpf_map<a,b>, k : ref<h,a>, v : ref<h,b>, f : flag_map) : int 
+pub extern bpf_map_update_elem (m : bpf_map<a,b>, k : ref<h,a>, v : ref<h,b>, f : bpf_map_flags) : int 
   c inline "bpf_map_update_elem(#1, #2, #3, #4)"
 
 /*

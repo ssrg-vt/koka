@@ -7,4 +7,4 @@ pub ref struct sec ".maps" bpf_map<a,b>
   max_entries : int
   key_type : a
   value_type : b
-  map_flags : flag_map
+  map_flags : bpf_map_flags

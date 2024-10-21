@@ -186,10 +186,11 @@ pub type bpf_cmd
   BPF_GET_CURRENT_UID_GID 
   BPF_GET_CURRENT_PID_TGID 
 
-pub type flag_map
+pub type bpf_map_flags
   BPF_ANY       /* create new element or update existing */
   BPF_NOEXIST   /* create new element if it didn't exist */
   BPF_EXIST     /* update existing element */
+  NONE
 
 pub type bpf_arg_type 
   ARG_DONTCARE      /* unused argument in helper function */

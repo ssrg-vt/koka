@@ -29,4 +29,3 @@ Error: failed to load object file
 `fletcher32_test.bpf.c`: Rejected because "R1 invalid mem access 'scalar'"
 
 It doesn't like the *data++ dereference
-
