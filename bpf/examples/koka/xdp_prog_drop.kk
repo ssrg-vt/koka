@@ -38,6 +38,9 @@ import bpf/bpflib/if_ether
 pub extern htons (x : int32) : int32
   c inline "htons(#1)"
 
+pub extern sizeof (n : a) : int32
+  c inline "sizeof(#1)"
+
 // must begin with a lower case or Koka thinks it's a constructor
 val eth_p_ipv4 = 0x0800.int32
 
@@ -48,8 +51,10 @@ pub fun xdp_drop_prog(packet_context : xdp_md) {
   val data_end : int32 = packet_context.data_end 
   val data : int32 = packet_context.data;
 
-  // sizeof does not exist but we know the result would be 14
-  if data + 14.int32 > data_end
+  // sizeof(struct ethhdr) should be 14. would be nice to pass a type to sizeof
+  // instead of dummy value
+  val ethhdr_dummy : ethhdr = Ethhdr()
+  if data + sizeof(ethhdr_dummy) > data_end
     then return XDP_DROP
 
   // no good way to do the casting so directly pull the low 16 bits
@@ -57,7 +62,7 @@ pub fun xdp_drop_prog(packet_context : xdp_md) {
 
   while { h_proto > 0.int32 }
     h_proto := h_proto - 1.int32
-    // should call bpf_printk but that is not supported
+    // should call bpf_printk but that hasn't been added yet
 
   // should use bpf_htons but that is not yet supported and the origional 
   // program opts for ordinary htons
