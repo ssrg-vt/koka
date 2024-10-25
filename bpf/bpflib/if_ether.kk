@@ -1,4 +1,6 @@
-module bpf/bpflib/if_ethr
+module bpf/bpflib/if_ether
+
+import std/num/int32
 
 // https://github.com/torvalds/linux/blob/master/include/uapi/linux/if_ether.h
 
@@ -19,7 +21,7 @@ pub val eth_max_mtu = 0xFFF           // 65535, same as IP_MAX_MTU	*/
  *	These are the defined Ethernet Protocol ID's.
  */
 pub val eth_p_loop = 0x0060           // /* Ethernet Loopback packet	*/
-pub val eth_p_pup = 0x0200            // 	/* Xerox PUP packet		*/
+pub val eth_p_pup = 0x0200            // /* Xerox PUP packet		*/
 pub val eth_p_pupat = 0x0201          // /* Xerox PUP Addr Trans packet	*/
 pub val eth_p_tsn = 0x22F0            // /* TSN (IEEE 1722) packet	*/
 pub val eth_p_erspan2 = 0x22EB        // /* ERSPAN version 2 (type III)	*/
@@ -48,8 +50,7 @@ pub val eth_p_ipx = 0x8137            // /* IPX over DIX			*/
 pub val eth_p_ipv6 = 0x86DD           // /* IPv6 over bluebook		*/
 pub val eth_p_pause = 0x8808          // /* IEEE Pause frames. See 802.3 31B */
 pub val eth_p_slow = 0x8809           // /* Slow Protocol. See 802.3ad 43B */
-pub val eth_p_wccp = 0x883E           // /* Web-cache coordination protocol 
-                                      // defined in draft-wilson-wrec-wccp-v2-00.txt */
+pub val eth_p_wccp = 0x883E           // /* Web-cache coordination protocol defined in draft-wilson-wrec-wccp-v2-00.txt */
 pub val eth_p_mpls_uc = 0x8847        // /* MPLS Unicast traffic		*/
 pub val eth_p_mpls_mc =  0x8848       // /* MPLS Multicast traffic	*/
 pub val eth_p_atmmpoa = 0x884c        // /* MultiProtocol Over ATM	*/
@@ -94,8 +95,8 @@ pub val eth_p_af_iucv =  0xFBFB       // /* IBM af_iucv [ NOT AN OFFICIALLY REGI
 pub val eth_p_802_3_min = 0x0600      // /* If the value in the ethernet type is more than this value then the frame is Ethernet II. Else it is 802.3 */
 
 pub struct tattribute "packed" ethhdr 
-  //h_dest : array of char of size eth_alen (* add later *)
-  //h_source : array of char of size eth_alen (* add later *)
+  // h_dest : array of char of size eth_alen (* add later *)
+  // h_source : array of char of size eth_alen (* add later *)
   h_proto : int32    /* packet type ID field: it should be 16 bit, so we use shr operator to get the value */
 
 pub fun main() {

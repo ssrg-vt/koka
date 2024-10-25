@@ -1,7 +1,7 @@
 /*
 Focus points:
   - void context
-	- bpf_printk with multiple arguments (variadic function)
+	- bpf_printk with multiple arguments
 */
 
 /*
@@ -11,6 +11,7 @@ https://github.com/libbpf/libbpf-bootstrap/blob/master/examples/c/minimal.bpf.c
 /* Copyright (c) 2020 Facebook */
 #include <linux/bpf.h>
 #include <bpf/bpf_helpers.h>
+#include <stdint.h>
 
 char LICENSE[] SEC("license") = "Dual BSD/GPL";
 

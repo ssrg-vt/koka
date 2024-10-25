@@ -23,14 +23,15 @@ pub fun xdp_action_show( xdp : xdp_action ) : string
     XDP_TX -> "XDP_TX"
     XDP_REDIRECT -> "XDP_REDIRECT"
 
+// all values should be uint32
 pub ref struct xdp_md 
-  data : int32       // pointer to beginning of the packet data // should be changed to unsigned int
-  data_end : int32  // pointer to the end of the packet data // should be changed to unsigned int
-  data_meta : int32 // meta data
-  // Below access go through struct xdp_rxq_info // should be changed to unsigned int
-  ingress_ifindex : int32 // rxq->dev->ifindex 
-  rx_queue_index : int32  // rxq->queue_index  
-  egress_ifindex : int32 // txq->dev->ifindex 
+  data : int32       // pointer to beginning of the packet data
+  data_end : int32   // pointer to the end of the packet data
+  data_meta : int32  // meta data
+  // Below access go through struct xdp_rxq_info
+  ingress_ifindex : int32 // rxq->dev->ifindex
+  rx_queue_index : int32  // rxq->queue_index
+  egress_ifindex : int32  // txq->dev->ifindex
 
 pub ref struct bpf_pidns_info 
   pid : int32
